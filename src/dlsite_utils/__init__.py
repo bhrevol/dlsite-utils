@@ -1,1 +1,1 @@
-"""DLsite Utilities."""
+"""DLsite Utilties."""  # noqa: D403

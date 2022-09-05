@@ -36,16 +36,33 @@ def rename(path: Iterable[Path], force: bool, dry_run: bool) -> None:
 
     Input paths should contain a DLsite work ID somewhere in the dir/file name.
     """
-    for p in path:
-        asyncio.run(_rename(p, force=force, dry_run=dry_run))
+
+    async def _gather(paths: Iterable[Path], **kwargs):
+        await asyncio.gather(*(_rename(path, **kwargs) for path in paths))
+
+    asyncio.run(_gather(path, force=force, dry_run=dry_run))
 
 
 async def _rename(path: Path, force: bool = False, dry_run: bool = False) -> None:
     try:
+        name = await _make_name(path)
+    except InvalidIDError:
+        return
+    new_path = path.parent / name
+    click.echo(f"Renaming {path} to {new_path}")
+    if new_path.exists() and not force:
+        click.secho("{new_path} already exists.", fg="red")
+        return
+    if not dry_run:
+        path.rename(new_path)
+
+
+async def _make_name(path: Path) -> str:
+    try:
         product_id = find_product_id(str(path.name))
     except InvalidIDError:
         click.secho(f"{path} does not appear to be a DLsite work.", fg="red")
-        return
+        raise
     work = await get_work(product_id)
     if work.circle:
         circle: str = f"[{work.circle}] "
@@ -57,11 +74,4 @@ async def _rename(path: Path, force: bool = False, dry_run: bool = False) -> Non
     else:
         circle = ""
     suffix = "".join(path.suffixes)
-    name = sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")
-    new_path = path.parent / name
-    click.echo(f"Renaming {path} to {new_path}")
-    if new_path.exists() and not force:
-        click.secho("{new_path} already exists.", fg="red")
-        return
-    if not dry_run:
-        path.rename(new_path)
+    return sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")

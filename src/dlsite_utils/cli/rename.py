@@ -1,7 +1,7 @@
 """Rename DLsite work files and dirs."""
 import asyncio
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, cast
 
 import click
 from dlsite_async.exceptions import InvalidIDError
@@ -37,7 +37,7 @@ def rename(path: Iterable[Path], force: bool, dry_run: bool) -> None:
     Input paths should contain a DLsite work ID somewhere in the dir/file name.
     """
 
-    async def _gather(paths: Iterable[Path], **kwargs):
+    async def _gather(paths: Iterable[Path], **kwargs: bool) -> None:
         await asyncio.gather(*(_rename(path, **kwargs) for path in paths))
 
     asyncio.run(_gather(path, force=force, dry_run=dry_run))
@@ -74,4 +74,6 @@ async def _make_name(path: Path) -> str:
     else:
         circle = ""
     suffix = "".join(path.suffixes)
-    return sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")
+    return cast(
+        str, sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")
+    )

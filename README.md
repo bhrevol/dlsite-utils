@@ -19,13 +19,15 @@
 [pre-commit]: https://github.com/pre-commit/pre-commit
 [black]: https://github.com/psf/black
 
+Assorted utilities for managing DLsite works.
+
 ## Features
 
-- TODO
+- `dlsite rename`: Rename files/directories based on DLsite work circle/title
 
 ## Requirements
 
-- TODO
+- Python 3.9+
 
 ## Installation
 

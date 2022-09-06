@@ -4,8 +4,14 @@ from dlsite_async import AgeCategory, DlsiteAPI, Work
 from pytest_mock import MockerFixture
 
 
+class MockDlsiteAPI(DlsiteAPI):
+    """Mocked DLsite API instance."""
+
+    work: Work
+
+
 @pytest.fixture
-async def dlsite_api(mocker: MockerFixture) -> DlsiteAPI:
+async def dlsite_api(mocker: MockerFixture) -> MockDlsiteAPI:
     """Patch and return mocked DLsiteAPI instance."""
     test_work = Work("RJ1234", "maniax", "RG1234", "Test Work", AgeCategory.R18)
     mock = mocker.patch(

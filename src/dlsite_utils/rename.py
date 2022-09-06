@@ -15,7 +15,7 @@ async def rename(
     """Rename path according to DLsite work info."""
     try:
         name = await _make_name(api, path)
-    except InvalidIDError:
+    except InvalidIDError:  # pragma: no cover
         return
     new_path = path.parent / name
     click.echo(f"Renaming {path} to {new_path}")
@@ -29,7 +29,7 @@ async def rename(
 async def _make_name(api: DlsiteAPI, path: Path) -> str:
     try:
         product_id = find_product_id(str(path.name))
-    except InvalidIDError:
+    except InvalidIDError:  # pragma: no cover
         click.secho(f"{path} does not appear to be a DLsite work.", fg="red")
         raise
     work = await api.get_work(product_id)

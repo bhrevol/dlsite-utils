@@ -3,10 +3,12 @@ from pathlib import Path
 from typing import Any, Dict
 
 import pytest
-from dlsite_async import AgeCategory, DlsiteAPI, Work
+from dlsite_async import AgeCategory, Work
 from pytest_mock import MockerFixture
 
 from dlsite_utils.rename import _make_name, rename
+
+from .conftest import MockDlsiteAPI
 
 
 @pytest.mark.parametrize(
@@ -38,7 +40,7 @@ from dlsite_utils.rename import _make_name, rename
     ],
 )
 async def test_make_name(
-    dlsite_api: DlsiteAPI,
+    dlsite_api: MockDlsiteAPI,
     path: Path,
     work_kwargs: Dict[str, Any],
     expected: str,
@@ -57,7 +59,7 @@ async def test_make_name(
     assert expected == await _make_name(dlsite_api, path)
 
 
-async def test_rename(tmp_path: Path, dlsite_api: DlsiteAPI) -> None:
+async def test_rename(tmp_path: Path, dlsite_api: MockDlsiteAPI) -> None:
     """Rename should succeed."""
     source = tmp_path / "RJ1234.zip"
     source.write_text("")
@@ -68,7 +70,7 @@ async def test_rename(tmp_path: Path, dlsite_api: DlsiteAPI) -> None:
     assert dest.exists()
 
 
-async def test_rename_dry(tmp_path: Path, dlsite_api: DlsiteAPI) -> None:
+async def test_rename_dry(tmp_path: Path, dlsite_api: MockDlsiteAPI) -> None:
     """Should not rename."""
     source = tmp_path / "RJ1234.zip"
     source.write_text("")
@@ -79,7 +81,7 @@ async def test_rename_dry(tmp_path: Path, dlsite_api: DlsiteAPI) -> None:
     assert not dest.exists()
 
 
-async def test_rename_force(tmp_path: Path, dlsite_api: DlsiteAPI) -> None:
+async def test_rename_force(tmp_path: Path, dlsite_api: MockDlsiteAPI) -> None:
     """Rename should succeed with force."""
     source = tmp_path / "RJ1234.zip"
     source.write_text("foo")

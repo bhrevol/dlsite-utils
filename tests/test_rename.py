@@ -55,7 +55,9 @@ async def test_make_name(
         AgeCategory.R18,
         **work_kwargs,
     )
-    dlsite_api.get_work = mocker.AsyncMock(return_value=work)
+    dlsite_api.get_work = mocker.AsyncMock(  # type: ignore[assignment]
+        return_value=work
+    )
     assert expected == await _make_name(dlsite_api, path)
 
 

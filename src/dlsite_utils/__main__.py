@@ -1,12 +1,18 @@
 """Command-line interface."""
 import asyncio
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 import click
 import dlsite_async
 
 from .rename import rename as _rename
+
+
+_LOCALES = {
+    "en": "en_US",
+    "jp": "ja_JP",
+}
 
 
 @click.group()
@@ -16,6 +22,13 @@ def cli() -> None:
 
 
 @cli.command()
+@click.option(
+    "-l",
+    "--language",
+    type=click.Choice(["en", "jp"], case_sensitive=False),
+    default=None,
+    help="Preferred metadata language.",
+)
 @click.option(
     "-f",
     "--force",
@@ -35,14 +48,17 @@ def cli() -> None:
     type=click.Path(exists=True, path_type=Path),
     nargs=-1,
 )
-def rename(path: Iterable[Path], force: bool, dry_run: bool) -> None:
+def rename(
+    path: Iterable[Path], language: Optional[str], force: bool, dry_run: bool
+) -> None:
     """Rename paths based on DLsite work information.
 
     Input paths should contain a DLsite work ID somewhere in the dir/file name.
     """
+    locale = _LOCALES.get(language.lower()) if language else None
 
     async def _gather(paths: Iterable[Path], **kwargs: bool) -> None:
-        async with dlsite_async.DlsiteAPI() as api:
+        async with dlsite_async.DlsiteAPI(locale=locale) as api:
             await asyncio.gather(*(_rename(api, path, **kwargs) for path in paths))
 
     asyncio.run(_gather(path, force=force, dry_run=dry_run))

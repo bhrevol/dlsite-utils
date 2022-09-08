@@ -24,6 +24,8 @@ Assorted utilities for managing DLsite works.
 ## Features
 
 - `dlsite rename`: Rename files/directories based on DLsite work circle/title
+- `dlsite dlst-extract`: Extract contents of DLST files.
+  - Requires CypherTec DRM AES128 key and IV used to encrypt the file.
 
 ## Requirements
 

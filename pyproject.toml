@@ -21,6 +21,7 @@ click = ">=8.0.1"
 dlsite-async = "^0.0.1"
 aiohttp = "^3.8.1"
 pathvalidate = "^2.5.2"
+cryptography = "^38.0.1"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"

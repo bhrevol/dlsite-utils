@@ -1,11 +1,14 @@
 """Command-line interface."""
 import asyncio
+import os
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, TextIO, Tuple, cast
 
 import click
 import dlsite_async
+from tqdm import tqdm
 
+from .dlst import DlstFile, DlstInfo
 from .rename import rename as _rename
 
 
@@ -62,6 +65,65 @@ def rename(
             await asyncio.gather(*(_rename(api, path, **kwargs) for path in paths))
 
     asyncio.run(_gather(path, force=force, dry_run=dry_run))
+
+
+@cli.command()
+@click.option("-k", "--key", help="AES key")
+@click.option("-i", "--iv", help="AES IV")
+@click.option("--key-file", type=click.File(), help="YAML key file.")
+@click.argument(
+    "dlst_file",
+    type=click.Path(exists=True, path_type=Path),
+)
+def dlst_extract(
+    dlst_file: Path,
+    key: Optional[str],
+    iv: Optional[str],
+    key_file: Optional[click.File],
+) -> None:
+    """Extract images from DLST file.
+
+    If --key or --key-file are not provided, will default to using 'keys.yml'.
+    """
+    biv: Optional[bytes] = None
+    if key:
+        bkey = bytes.fromhex(key)
+    else:  # pragma: no cover
+        try:
+            if key_file:
+                bkey, biv = _load_keys(cast(TextIO, key_file))
+            else:
+                with open("keys.yml") as fobj:
+                    bkey, biv = _load_keys(fobj)
+        except (KeyError, FileNotFoundError):
+            click.secho("No valid key file found")
+            return
+    if iv:  # pragma: no cover
+        biv = bytes.fromhex(iv)
+
+    with DlstFile(dlst_file, bkey, biv) as dlst:
+        pbar = tqdm([info for info in dlst.infolist() if info.name != "index.bin"])
+        for info in pbar:  # pragma: no cover
+            _dlst_extract_one(dlst, info, dlst_file.parent / dlst_file.stem, pbar)
+
+
+def _dlst_extract_one(
+    dlst: DlstFile, info: DlstInfo, output_dir: Path, pbar: tqdm
+) -> None:  # pragma: no cover
+    if not output_dir.exists():
+        os.makedirs(output_dir)
+    pbar.set_description(f"Extracting {info.name}")
+    data = dlst.read(info)
+    with open(output_dir / info.name, "wb") as fobj:
+        fobj.write(data)
+
+
+def _load_keys(fobj: TextIO) -> Tuple[bytes, Optional[bytes]]:  # pragma: no cover
+    from ruamel.yaml import YAML
+
+    data = YAML().load(fobj)
+    iv = data.get("iv")
+    return bytes.fromhex(data["key"]), bytes.fromhex(iv) if iv else None
 
 
 if __name__ == "__main__":

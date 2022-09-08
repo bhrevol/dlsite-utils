@@ -22,6 +22,8 @@ dlsite-async = "^0.0.1"
 aiohttp = "^3.8.1"
 pathvalidate = "^2.5.2"
 cryptography = "^38.0.1"
+"ruamel.yaml" = "^0.17.21"
+tqdm = "^4.64.1"
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
@@ -66,6 +68,7 @@ tests = ["tests", "*/tests"]
 [tool.coverage.run]
 branch = true
 source = ["dlsite_utils", "tests"]
+omit = ["*/site-packages/dlsite_utils/dlst.py"]
 
 [tool.coverage.report]
 show_missing = true
@@ -84,6 +87,10 @@ pretty = true
 show_column_numbers = true
 show_error_codes = true
 show_error_context = true
+
+[[tool.mypy.overrides]]
+module = ["tqdm"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

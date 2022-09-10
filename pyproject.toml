@@ -51,12 +51,18 @@ typeguard = ">=2.13.3"
 xdoctest = {extras = ["colors"], version = ">=0.15.10"}
 myst-parser = {version = ">=0.16.1"}
 
+[tool.poetry.extras]
+mutagen = ["mutagen"]
+
 [tool.poetry.scripts]
 dlsite = "dlsite_utils.__main__:cli"
 
 [tool.poetry.group.dev.dependencies]
 pytest-asyncio = "^0.20.0"
 pytest-mock = "^3.8.2"
+
+[tool.poetry.group.mutagen.dependencies]
+mutagen = {version = "^1.45.1", optional = true}
 
 [tool.bandit]
 skips = ["B320"]

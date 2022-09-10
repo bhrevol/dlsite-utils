@@ -26,6 +26,8 @@ Assorted utilities for managing DLsite works.
 - `dlsite rename`: Rename files/directories based on DLsite work circle/title
 - `dlsite dlst-extract`: Extract contents of DLST files.
   - Requires CypherTec DRM AES128 key and IV used to encrypt the file.
+- `dlsite autotag`: Automatically tag audio files based on DLsite work.
+  - Requires `dlsite-utils[mutagen]` extras.
 
 ## Requirements
 
@@ -37,6 +39,12 @@ You can install _DLsite Utilities_ via [pip] from [PyPI]:
 
 ```console
 $ pip install dlsite-utils
+```
+
+To install _Dlsite Utilities_ with optional dependencies:
+
+```console
+$ pip install dlsite-utils[mutagen]
 ```
 
 ## Usage
@@ -53,6 +61,11 @@ To learn more, see the [Contributor Guide].
 Distributed under the terms of the [MIT license][license],
 _DLsite Utilities_ is free and open source software.
 
+[Mutagen][mutagen] is licensed under the terms of the GNU General Public
+License v2.0 or later. If you redistribute _dlsite-utils_ with the optional
+`mutagen` extra included, your redistribution must comply with the terms of the
+GPL v2.0 or later.
+
 ## Issues
 
 If you encounter any problems,
@@ -67,6 +80,7 @@ This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter]
 [hypermodern python cookiecutter]: https://github.com/cjolowicz/cookiecutter-hypermodern-python
 [file an issue]: https://github.com/bhrevol/dlsite-utils/issues
 [pip]: https://pip.pypa.io/
+[mutagen]: https://github.com/quodlibet/mutagen
 
 <!-- github-only -->
 

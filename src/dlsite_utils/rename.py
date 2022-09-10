@@ -23,7 +23,7 @@ async def rename(
         click.secho("{new_path} already exists.", fg="red")
         return
     if not dry_run:
-        path.rename(new_path)
+        path.replace(new_path)
 
 
 async def _make_name(api: DlsiteAPI, path: Path) -> str:

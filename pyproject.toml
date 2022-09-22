@@ -24,6 +24,7 @@ pathvalidate = "^2.5.2"
 cryptography = "^38.0.1"
 "ruamel.yaml" = "^0.17.21"
 tqdm = "^4.64.1"
+mutagen = {version = "^1.45.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"
@@ -60,9 +61,6 @@ dlsite = "dlsite_utils.__main__:cli"
 [tool.poetry.group.dev.dependencies]
 pytest-asyncio = "^0.20.0"
 pytest-mock = "^3.8.2"
-
-[tool.poetry.group.mutagen.dependencies]
-mutagen = {version = "^1.45.1", optional = true}
 
 [tool.bandit]
 skips = ["B320"]

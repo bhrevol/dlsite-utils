@@ -126,5 +126,52 @@ def _load_keys(fobj: TextIO) -> Tuple[bytes, Optional[bytes]]:  # pragma: no cov
     return bytes.fromhex(data["key"]), bytes.fromhex(iv) if iv else None
 
 
+@cli.command()
+@click.argument(
+    "file",
+    type=click.Path(exists=True, path_type=Path),
+    nargs=-1,
+)
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Force overwriting existing tags.",
+)
+@click.option(
+    "-l",
+    "--language",
+    type=click.Choice(["en", "jp"], case_sensitive=False),
+    default=None,
+    help="Preferred metadata language.",
+)
+@click.option(
+    "-n",
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Show how files would be tagged, but do not actually do anything.",
+)
+def autotag(file: Path, force: bool, language: str, dry_run: bool) -> None:
+    """Tag audio files based on DLsite work."""
+    from dlsite_utils.audio.tag import AudioTagger
+
+    async def _run(file: Path):
+        file = Path(os.path.abspath(file))
+        product_id = AudioTagger.find_product_id(file)
+        async with dlsite_async.DlsiteAPI(locale=locale) as api:
+            work = await api.get_work(product_id)
+            click.echo(f"Tagging {file} -> {work.product_id} - {work.work_name}")
+            tagger = AudioTagger(work)
+            tags = tagger.tag(file, force=force, dry_run=dry_run)
+            for k, v in tags.items():
+                click.echo(f"  {k}: {v}")
+
+    locale = _LOCALES.get(language.lower()) if language else None
+    for f in file:
+        asyncio.run(_run(f))
+
+
 if __name__ == "__main__":
     cli(prog_name="dlsite")  # pragma: no cover

@@ -234,11 +234,11 @@ python-versions = "*"
 
 [[package]]
 name = "dlsite-async"
-version = "0.0.1"
+version = "0.1.0"
 description = "DLsite Async"
 category = "main"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = ">=3.9,<4.0"
 
 [package.dependencies]
 aiohttp = ">=3.8.1,<4.0.0"
@@ -1287,7 +1287,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "3e47684d75f9fd9b912d9a19d3c5d0ae1912564367ef0cdd3090d639af6c271d"
+content-hash = "ea3ca8b257c652dbfa026f1b2a83240104a2be300a9471793ef860459bd9630e"
 
 [metadata.files]
 aiohttp = [
@@ -1607,8 +1607,8 @@ distlib = [
     {file = "distlib-0.3.6.tar.gz", hash = "sha256:14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46"},
 ]
 dlsite-async = [
-    {file = "dlsite-async-0.0.1.tar.gz", hash = "sha256:e107bc65ec31387c80ad18f98ee5f824c4a1af4286eb00e82df219fa3be8238a"},
-    {file = "dlsite_async-0.0.1-py3-none-any.whl", hash = "sha256:4d116b44e2bbf4ce2724907735eb703954159f8e2591b84ef22d3541135c5deb"},
+    {file = "dlsite-async-0.1.0.tar.gz", hash = "sha256:4159db24782f33616d125c4b0857fba1734141992251e9e21c45d99aab8c1e13"},
+    {file = "dlsite_async-0.1.0-py3-none-any.whl", hash = "sha256:8857e27bf9b4149098560f77ab78a5ee00d53b44f0abeb8e43c4c4b83cee42c0"},
 ]
 docutils = [
     {file = "docutils-0.18.1-py2.py3-none-any.whl", hash = "sha256:23010f129180089fbcd3bc08cfefccb3b890b0050e1ca00c867036e9d161b98c"},

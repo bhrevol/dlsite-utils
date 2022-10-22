@@ -237,7 +237,11 @@ class AudioTagger:
         self._set_tag(
             tags,
             tag_type.ARTIST,
-            self._multistring(tags, self.work.voice_actor),
+            (
+                self._multistring(tags, self.work.voice_actor)
+                if self.work.voice_actor
+                else self._get_circle()
+            ),
             **kwargs,
         )
         self._set_tag(tags, tag_type.CATALOG_NUMBER, self.work.product_id, **kwargs)

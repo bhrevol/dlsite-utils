@@ -22,7 +22,7 @@ except ImportError:
 
 
 package = "dlsite_utils"
-python_versions = ["3.10", "3.9"]
+python_versions = ["3.11", "3.10", "3.9"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",
@@ -145,7 +145,7 @@ def safety(session: Session) -> None:
     session.run("safety", "check", "--full-report", f"--file={requirements}")
 
 
-@session(python=python_versions)
+@session(python=python_versions[0])
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or ["src", "tests", "docs/conf.py"]
@@ -191,7 +191,7 @@ def typeguard(session: Session) -> None:
     session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
 
 
-@session(python=python_versions)
+@session(python=python_versions[0])
 def xdoctest(session: Session) -> None:
     """Run examples with xdoctest."""
     if session.posargs:

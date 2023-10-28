@@ -12,7 +12,7 @@ try:
     import mutagen
 except ImportError as e:
     raise ImportError(
-        "Missing dependency mutagen requires installation via " "dlsite-utils[mutagen]"
+        "Missing dependency mutagen requires installation via dlsite-utils[mutagen]"
     ) from e
 
 from dlsite_async import Work, WorkType
@@ -24,9 +24,13 @@ from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3
 
 
-EasyMP4Tags.RegisterTextKey("composer", "\xa9wrt")
-EasyMP4Tags.RegisterFreeformKey("catalognumber", "CATALOGNUMBER")
-EasyMP4Tags.RegisterFreeformKey("organization", "LABEL")
+EasyMP4Tags.RegisterTextKey("composer", "\xa9wrt")  # type: ignore[no-untyped-call]
+EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
+    "catalognumber", "CATALOGNUMBER"
+)
+EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
+    "organization", "LABEL"
+)
 
 
 _TITLE_RE = re.compile(
@@ -75,7 +79,8 @@ class _VorbisTag(str, Enum):
     TRACK_NUMBER = "tracknumber"
 
 
-_Tag = Union[_EasyTag, _VorbisTag]
+_Tags = Union[EasyID3, EasyMP4Tags, mutagen._vorbis.VCommentDict]
+_TagType = Union[type[_EasyTag], type[_VorbisTag]]
 
 
 class AudioTagger:
@@ -96,7 +101,7 @@ class AudioTagger:
         self.work = work
 
     @staticmethod
-    def _tag_type(file: mutagen.FileType) -> _Tag:
+    def _tag_type(file: mutagen.FileType) -> _TagType:
         """Return tag type for the specified file."""
         if isinstance(file, FLAC):
             return _VorbisTag
@@ -136,7 +141,7 @@ class AudioTagger:
             m = _TITLE_PARENT_RE.match(parent)
             if m:
                 disc = m.group("disc_number")
-                disc_number: Optional[int] = int(disc, 10) if disc is not None else None
+                disc_number = int(disc, 10) if disc is not None else None
         return TrackParts(disc_number, track_number, title)
 
     @staticmethod
@@ -178,7 +183,7 @@ class AudioTagger:
         disc_number: Optional[Union[int, Tuple[int, int]]] = None,
         force: bool = False,
         dry_run: bool = False,
-    ) -> mutagen.Tags:
+    ) -> _Tags:
         """Return tags for the specified audio file.
 
         Tags are set as follows:
@@ -205,14 +210,14 @@ class AudioTagger:
             force: Replace existing tags.
             dry_run: If True, tags will not be written back to the file.
 
-        Return:
+        Returns:
             New tags.
         """
         audio_file = mutagen.File(file, easy=True)
         tag_type = self._tag_type(audio_file)
         path = Path(file if isinstance(file, (str, Path)) else file.name)
         if audio_file.tags is None and isinstance(audio_file, EasyMP3):
-            tags: mutagen.Tags = EasyID3()
+            tags: _Tags = EasyID3()  # type: ignore[no-untyped-call]
         else:
             tags = deepcopy(audio_file.tags)
         self._tag_album(tags, tag_type, force=force)
@@ -228,9 +233,9 @@ class AudioTagger:
 
     def _tag_album(
         self,
-        tags: mutagen.Tags,
-        tag_type: _Tag,
-        **kwargs,
+        tags: _Tags,
+        tag_type: _TagType,
+        **kwargs: Any,
     ) -> None:
         self._set_tag(tags, tag_type.ALBUM, self.work.work_name, **kwargs)
         self._set_tag(tags, tag_type.ALBUM_ARTIST, self._get_circle(), **kwargs)
@@ -262,16 +267,16 @@ class AudioTagger:
     def _tag_title(
         self,
         path: Path,
-        tags: mutagen.Tags,
-        tag_type: _Tag,
-        **kwargs,
+        tags: _Tags,
+        tag_type: _TagType,
+        **kwargs: Any,
     ) -> None:
         _, _, title = self.find_track_parts(path)
         self._set_tag(tags, tag_type.TITLE, title, **kwargs)
 
     @staticmethod
-    def _set_tag(tags: mutagen.Tags, key: str, value: Any, force: bool = False) -> None:
-        if force or not tags.get(key):
+    def _set_tag(tags: _Tags, key: str, value: Any, force: bool = False) -> None:
+        if force or not tags.get(key):  # type: ignore[no-untyped-call]
             tags[key] = value
 
     def _get_circle(self) -> str:
@@ -283,7 +288,7 @@ class AudioTagger:
         )
 
     @staticmethod
-    def _multistring(tags: mutagen.Tags, strings: Iterable[str]) -> str:
+    def _multistring(tags: _Tags, strings: Iterable[str]) -> Union[str, list[str]]:
         if isinstance(tags, EasyMP4Tags):
             return "; ".join(strings)
         return list(strings)
@@ -296,7 +301,7 @@ class AudioTagger:
         return "Audio drama"
 
     def _get_label(self) -> str:
-        def _make_label(s: str):
+        def _make_label(s: str) -> str:
             return f"{s} [{self.work.maker_id}]"
 
         if self.work.label:

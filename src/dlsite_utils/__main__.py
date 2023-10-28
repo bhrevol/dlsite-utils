@@ -153,11 +153,11 @@ def _load_keys(fobj: TextIO) -> Tuple[bytes, Optional[bytes]]:  # pragma: no cov
     default=False,
     help="Show how files would be tagged, but do not actually do anything.",
 )
-def autotag(file: Path, force: bool, language: str, dry_run: bool) -> None:
+def autotag(file: Iterable[Path], force: bool, language: str, dry_run: bool) -> None:
     """Tag audio files based on DLsite work."""
     from dlsite_utils.audio.tag import AudioTagger
 
-    async def _run(file: Path):
+    async def _run(file: Path) -> None:
         file = Path(os.path.abspath(file))
         product_id = AudioTagger.find_product_id(file)
         async with dlsite_async.DlsiteAPI(locale=locale) as api:
@@ -165,7 +165,7 @@ def autotag(file: Path, force: bool, language: str, dry_run: bool) -> None:
             click.echo(f"Tagging {file} -> {work.product_id} - {work.work_name}")
             tagger = AudioTagger(work)
             tags = tagger.tag(file, force=force, dry_run=dry_run)
-            for k, v in tags.items():
+            for k, v in tags.items():  # type: ignore[no-untyped-call]
                 click.echo(f"  {k}: {v}")
 
     locale = _LOCALES.get(language.lower()) if language else None

@@ -1,4 +1,6 @@
 """Test fixtures."""
+from pathlib import Path
+
 import pytest
 from dlsite_async import AgeCategory, DlsiteAPI, Work
 from pytest_mock import MockerFixture
@@ -21,3 +23,10 @@ async def dlsite_api(mocker: MockerFixture) -> MockDlsiteAPI:
     mock.work = test_work
     mock.get_work = mocker.AsyncMock(return_value=test_work)
     return mock
+
+
+@pytest.fixture(autouse=True)
+def config_dir(tmp_path: Path, mocker: MockerFixture) -> Path:
+    """Override the default config directory."""
+    mocker.patch("platformdirs.user_config_dir", return_value=str(tmp_path))
+    return tmp_path

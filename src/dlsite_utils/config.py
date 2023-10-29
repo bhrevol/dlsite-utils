@@ -61,6 +61,9 @@ class Config:
             option: Configuration option.
             maker_id: Maker (circle) to prefer over default config.
             default: Default value to use when option is not set.
+
+        Returns:
+            Option value.
         """
         value = self._data.get(option, default)
         if maker_id:
@@ -87,6 +90,9 @@ class Config:
 
         Args:
             file_path: Configuration file to load.
+
+        Returns:
+            Loaded configuration.
         """
         return cls(cls._load(file_path), file_path or cls.default_config_path())
 
@@ -101,13 +107,11 @@ class Config:
 
         Args:
             file_path: Configuration file to load. Defaults to platform specific user
-                config location.
+                config location. If `file_path` is specified and the file does not exist
+                an exception will be raised.
 
         Returns:
             Config dictionary.
-
-        Raises:
-            FileNotFoundError: `file_path` was specified but the file does not exist.
         """
         if file_path:
             with open(file_path, "rb") as f:
@@ -131,10 +135,8 @@ class Config:
         Args:
             file_path: Configuration file to init.
             make_parents: Create parent directories if they do not already exist.
-            force: Overwrite `file_path` if it already exists.
-
-        Raises:
-            FileExistsError: `file_path` already exists and `force` was not specfied.
+            force: Overwrite `file_path` if it already exists. If `force` is False and
+                `file_path` already exists an exception will be raised.
         """
         if not isinstance(file_path, Path):
             file_path = Path(file_path)

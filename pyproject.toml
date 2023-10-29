@@ -25,6 +25,8 @@ cryptography = "^41.0.5"
 "ruamel.yaml" = "^0.18.0"
 tqdm = "^4.64.1"
 mutagen = {version = "^1.45.1", optional = true}
+platformdirs = "^3.11.0"
+tomli = {version = "^2.0.1", python = "<3.11"}
 
 [tool.poetry.dev-dependencies]
 Pygments = ">=2.10.0"

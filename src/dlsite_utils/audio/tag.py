@@ -5,7 +5,16 @@ import unicodedata
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, BinaryIO, Iterable, NamedTuple, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    BinaryIO,
+    Iterable,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
 
 
 try:
@@ -23,6 +32,12 @@ from mutagen.easymp4 import EasyMP4, EasyMP4Tags
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3
 
+from ..utils import configure_work
+
+
+if TYPE_CHECKING:
+    from ..config import Config
+
 
 EasyMP4Tags.RegisterTextKey("composer", "\xa9wrt")  # type: ignore[no-untyped-call]
 EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
@@ -33,10 +48,10 @@ EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
 )
 
 
-_TITLE_RE = re.compile(
-    r"^((?P<disc_number>\d+)-|-)?([#])?(?P<track_number>\d+)([._])?(?P<title>.+)$"
+DEFAULT_FILENAME_PATTERN = (
+    r"^((?P<disc_number>\d+)-|-)?([#])?(?P<track_number>\d+)([._])?.+$"
 )
-_TITLE_PARENT_RE = re.compile(r"^(?P<disc_number>\d+).*$")
+DEFAULT_PARENT_PATTERN = r"^(?P<disc_number>\d+).*$"
 
 
 class TrackParts(NamedTuple):
@@ -95,10 +110,34 @@ class AudioTagger:
 
     Args:
         work: DLsite work to use for tagging.
+        config: Optional config to use for tagging.
     """
 
-    def __init__(self, work: Work):
-        self.work = work
+    def __init__(self, work: Work, config: Optional["Config"] = None):
+        self.work = configure_work(work, config)
+
+        if config:
+            filename_pattern: str = config.get(
+                "autotag_filename_pattern",
+                maker_id=work.maker_id,
+                default=DEFAULT_FILENAME_PATTERN,
+            )
+            parent_pattern: str = config.get(
+                "autotag_parent_pattern",
+                maker_id=work.maker_id,
+                default=DEFAULT_FILENAME_PATTERN,
+            )
+            self._zero_indexed_track: bool = config.get(
+                "autotag_zero_indexed_track",
+                maker_id=work.maker_id,
+                default=False,
+            )
+        else:
+            filename_pattern = DEFAULT_FILENAME_PATTERN
+            parent_pattern = DEFAULT_PARENT_PATTERN
+            self._zero_indexed_track = False
+        self._title_re = re.compile(filename_pattern)
+        self._title_parent_re = re.compile(parent_pattern)
 
     @staticmethod
     def _tag_type(file: mutagen.FileType) -> _TagType:
@@ -109,8 +148,7 @@ class AudioTagger:
             return _EasyTag
         raise ValueError("Unsupported file type.")
 
-    @staticmethod
-    def find_track_parts(file_path: Union[str, Path]) -> TrackParts:
+    def find_track_parts(self, file_path: Union[str, Path]) -> TrackParts:  # noqa: C901
         """Try to parse a filename into track information.
 
         Args:
@@ -127,20 +165,35 @@ class AudioTagger:
         path = Path(file_path)
         filename = unicodedata.normalize("NFKC", path.stem)
         title = filename
-        m = _TITLE_RE.match(filename)
+        m = self._title_re.match(filename)
         if m:
-            disc = m.group("disc_number")
-            track = m.group("track_number")
+            try:
+                title = m.group("title")
+            except IndexError:
+                pass
+            try:
+                disc = m.group("disc_number")
+            except IndexError:
+                disc = None
+            try:
+                track = m.group("track_number")
+            except IndexError:
+                track = None
             disc_number: Optional[int] = int(disc, 10) if disc is not None else None
             track_number: Optional[int] = int(track, 10) if track is not None else None
+            if self._zero_indexed_track and track_number is not None:
+                track_number += 1
         else:
             disc_number = None
             track_number = None
         if path.parent and disc_number is None:
             parent = unicodedata.normalize("NFKC", path.parent.name)
-            m = _TITLE_PARENT_RE.match(parent)
+            m = self._title_parent_re.match(parent)
             if m:
-                disc = m.group("disc_number")
+                try:
+                    disc = m.group("disc_number")
+                except IndexError:
+                    disc = None
                 disc_number = int(disc, 10) if disc is not None else None
         return TrackParts(disc_number, track_number, title)
 

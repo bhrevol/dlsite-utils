@@ -30,6 +30,7 @@ def test_rename_succeeds(runner: CliRunner, mocker: MockerFixture) -> None:
         Path("RJ1234.zip"),
         force=False,
         dry_run=False,
+        config=mocker.ANY,
     )
 
 

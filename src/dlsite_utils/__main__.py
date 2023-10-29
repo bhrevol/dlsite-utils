@@ -2,12 +2,13 @@
 import asyncio
 import os
 from pathlib import Path
-from typing import Iterable, Optional, TextIO, Tuple, cast
+from typing import Any, Iterable, Optional, TextIO, Tuple, cast
 
 import click
 import dlsite_async
 from tqdm import tqdm
 
+from .config import Config
 from .dlst import DlstFile, DlstInfo
 from .rename import rename as _rename
 
@@ -18,10 +19,40 @@ _LOCALES = {
 }
 
 
+pass_config = click.make_pass_decorator(Config)
+
+
 @click.group()
 @click.version_option()
-def cli() -> None:
+@click.option(
+    "-c",
+    "--config",
+    envvar="DLSITE_CONFIG",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Use the specified configuration file instead of the default config file.",
+)
+@click.pass_context
+def cli(ctx: click.Context, config: Optional[Path]) -> None:
     """DLsite utilities."""  # noqa: D403
+    ctx.obj = Config.from_file(config)
+
+
+@cli.command()
+@click.option(
+    "-l",
+    "--list",
+    "list_",
+    is_flag=True,
+    help="Print options set in the config in addition to the config path.",
+)
+@pass_config
+def config(config: Config, list_: bool) -> None:
+    """Print the config file location."""
+    click.echo(config.path)
+    if list_:
+        for line in config.list():
+            click.echo(line)
 
 
 @cli.command()
@@ -51,8 +82,13 @@ def cli() -> None:
     type=click.Path(exists=True, path_type=Path),
     nargs=-1,
 )
+@pass_config
 def rename(
-    path: Iterable[Path], language: Optional[str], force: bool, dry_run: bool
+    config: Config,
+    path: Iterable[Path],
+    language: Optional[str],
+    force: bool,
+    dry_run: bool,
 ) -> None:
     """Rename paths based on DLsite work information.
 
@@ -60,11 +96,11 @@ def rename(
     """
     locale = _LOCALES.get(language.lower()) if language else None
 
-    async def _gather(paths: Iterable[Path], **kwargs: bool) -> None:
+    async def _gather(paths: Iterable[Path], **kwargs: Any) -> None:
         async with dlsite_async.DlsiteAPI(locale=locale) as api:
             await asyncio.gather(*(_rename(api, path, **kwargs) for path in paths))
 
-    asyncio.run(_gather(path, force=force, dry_run=dry_run))
+    asyncio.run(_gather(path, force=force, dry_run=dry_run, config=config))
 
 
 @cli.command()
@@ -75,7 +111,9 @@ def rename(
     "dlst_file",
     type=click.Path(exists=True, path_type=Path),
 )
+@pass_config
 def dlst_extract(
+    config: Config,
     dlst_file: Path,
     key: Optional[str],
     iv: Optional[str],
@@ -153,7 +191,10 @@ def _load_keys(fobj: TextIO) -> Tuple[bytes, Optional[bytes]]:  # pragma: no cov
     default=False,
     help="Show how files would be tagged, but do not actually do anything.",
 )
-def autotag(file: Iterable[Path], force: bool, language: str, dry_run: bool) -> None:
+@pass_config
+def autotag(
+    config: Config, file: Iterable[Path], force: bool, language: str, dry_run: bool
+) -> None:
     """Tag audio files based on DLsite work."""
     from dlsite_utils.audio.tag import AudioTagger
 
@@ -163,7 +204,7 @@ def autotag(file: Iterable[Path], force: bool, language: str, dry_run: bool) -> 
         async with dlsite_async.DlsiteAPI(locale=locale) as api:
             work = await api.get_work(product_id)
             click.echo(f"Tagging {file} -> {work.product_id} - {work.work_name}")
-            tagger = AudioTagger(work)
+            tagger = AudioTagger(work, config=config)
             tags = tagger.tag(file, force=force, dry_run=dry_run)
             for k, v in tags.items():  # type: ignore[no-untyped-call]
                 click.echo(f"  {k}: {v}")

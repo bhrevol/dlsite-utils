@@ -2,13 +2,13 @@
 from pathlib import Path
 from typing import Any, Iterator, Optional, Union, cast
 
+import platformdirs
+
 
 try:
     import tomllib
 except ImportError:
     import tomli as tomllib  # type: ignore
-
-from platformdirs import user_config_dir
 
 from .audio.tag import DEFAULT_FILENAME_PATTERN, DEFAULT_PARENT_PATTERN
 
@@ -93,7 +93,7 @@ class Config:
     @classmethod
     def default_config_path(cls) -> Path:
         """Return the default configuration file path."""
-        return Path(user_config_dir(_APP_NAME)) / "config.toml"
+        return Path(platformdirs.user_config_dir(_APP_NAME)) / "config.toml"
 
     @classmethod
     def _load(cls, file_path: Optional[Union[str, Path]] = None) -> dict[str, Any]:

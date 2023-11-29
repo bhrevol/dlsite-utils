@@ -5,16 +5,7 @@ import unicodedata
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    BinaryIO,
-    Iterable,
-    NamedTuple,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, BinaryIO, Iterable, NamedTuple, Optional, Union
 
 
 try:
@@ -232,8 +223,6 @@ class AudioTagger:
     def tag(
         self,
         file: Union[str, Path, BinaryIO],
-        track_number: Optional[Union[int, Tuple[int, int]]] = None,
-        disc_number: Optional[Union[int, Tuple[int, int]]] = None,
         force: bool = False,
         dry_run: bool = False,
     ) -> _Tags:
@@ -258,8 +247,6 @@ class AudioTagger:
 
         Args:
             file: Audio file to tag.
-            track_number: Track number to use.
-            disc_number: Disc number to use.
             force: Replace existing tags.
             dry_run: If True, tags will not be written back to the file.
 
@@ -274,11 +261,12 @@ class AudioTagger:
         else:
             tags = deepcopy(audio_file.tags)
         self._tag_album(tags, tag_type, force=force)
-        self._tag_title(path, tags, tag_type, force=force)
+        disc_number, track_number, title = self.find_track_parts(path)
+        self._set_tag(tags, tag_type.TITLE, title, force=force)
         if track_number is not None:
-            self._set_tag(tags, tag_type.TRACK_NUMBER, track_number, force=force)
+            self._set_tag(tags, tag_type.TRACK_NUMBER, str(track_number), force=force)
         if disc_number is not None:
-            self._set_tag(tags, tag_type.DISC_NUMBER, disc_number, force=force)
+            self._set_tag(tags, tag_type.DISC_NUMBER, str(disc_number), force=force)
         if not dry_run:
             audio_file.tags = tags
             audio_file.save()
@@ -316,16 +304,6 @@ class AudioTagger:
             )
         self._set_tag(tags, tag_type.GENRE, self._get_genre(), **kwargs)
         self._set_tag(tags, tag_type.LABEL, self._get_label(), **kwargs)
-
-    def _tag_title(
-        self,
-        path: Path,
-        tags: _Tags,
-        tag_type: _TagType,
-        **kwargs: Any,
-    ) -> None:
-        _, _, title = self.find_track_parts(path)
-        self._set_tag(tags, tag_type.TITLE, title, **kwargs)
 
     @staticmethod
     def _set_tag(tags: _Tags, key: str, value: Any, force: bool = False) -> None:

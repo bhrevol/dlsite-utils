@@ -105,6 +105,51 @@ implicit_reexport = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest-asyncio<1.0.0,>=0.21.0",
+    "pytest-mock<4.0.0,>=3.8.2",
+]
+
+[tool.pdm.build]
+includes = []
+[project]
+authors = [
+    {name = "byeonhyeok", email = "bhrevol@gmail.com"},
+]
+license = {text = "MIT"}
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "click>=8.0.1",
+    "dlsite-async<1.0.0,>=0.2.0",
+    "aiohttp<4.0.0,>=3.8.1",
+    "pathvalidate<3.0.0,>=2.5.2",
+    "cryptography<42.0.0,>=41.0.5",
+    "ruamel-yaml<1.0.0,>=0.18.0",
+    "tqdm<5.0.0,>=4.64.1",
+    "platformdirs<4.0.0,>=3.11.0",
+    "tomli<3.0.0,>=2.0.1; python_version < \"3.11\"",
+]
+name = "dlsite-utils"
+version = "0.0.0"
+description = "DLsite Utilities"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+]
+
+[project.urls]
+Changelog = "https://github.com/bhrevol/dlsite-utils/releases"
+homepage = "https://github.com/bhrevol/dlsite-utils"
+repository = "https://github.com/bhrevol/dlsite-utils"
+documentation = "https://dlsite-utils.readthedocs.io"
+
+[project.optional-dependencies]
+mutagen = [
+    "mutagen<2.0.0,>=1.45.1",
+]
+
+[project.scripts]
+dlsite = "dlsite_utils.__main__:cli"

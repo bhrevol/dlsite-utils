@@ -7,19 +7,10 @@ from pathlib import Path
 from textwrap import dedent
 
 import nox
+from nox import Session, session
 
 
-try:
-    from nox_poetry import Session, session
-except ImportError:
-    message = f"""\
-    Nox failed to import the 'nox-poetry' package.
-
-    Please install it using the following command:
-
-    {sys.executable} -m pip install nox-poetry"""
-    raise SystemExit(dedent(message)) from None
-
+os.environ.update({"PDM_IGNORE_SAVED_PYTHON": "1"})
 
 package = "dlsite_utils"
 python_versions = ["3.11", "3.10", "3.9"]
@@ -112,45 +103,30 @@ def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
 @session(name="pre-commit", python=python_versions[0])
 def precommit(session: Session) -> None:
     """Lint using pre-commit."""
+    session.run_always("pdm", "install", "-G", "lint", external=True)
     args = session.posargs or [
         "run",
         "--all-files",
-        "--hook-stage=manual",
         "--show-diff-on-failure",
     ]
-    session.install(
-        "black",
-        "darglint",
-        "flake8",
-        "flake8-bandit",
-        "flake8-bugbear",
-        "flake8-docstrings",
-        "flake8-rst-docstrings",
-        "isort",
-        "pep8-naming",
-        "pre-commit",
-        "pre-commit-hooks",
-        "pyupgrade",
-    )
     session.run("pre-commit", *args)
-    if args and args[0] == "install":
-        activate_virtualenv_in_precommit_hooks(session)
 
 
 @session(python=python_versions[0])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
-    requirements = session.poetry.export_requirements()
-    session.install("safety")
-    session.run("safety", "check", "--full-report", f"--file={requirements}")
+    session.run_always("pdm", "install", "-G", "safety", external=True)
+    session.run("pdm", "export", "-o", "requirements.txt", "--without-hashes")
+    session.run("safety", "check", "--full-report", "--file=requirements.txt")
 
 
 @session(python=python_versions[0])
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
+    session.run_always(
+        "pdm", "install", "-G", "mutagen", "-G", "mypy", "-G", "tests", external=True
+    )
     args = session.posargs or ["src", "tests", "docs/conf.py"]
-    session.install(".[mutagen]")
-    session.install("mypy", "pytest", "pytest-asyncio", "pytest-mock")
     session.run("mypy", *args)
     if not session.posargs:
         session.run("mypy", f"--python-executable={sys.executable}", "noxfile.py")
@@ -159,9 +135,16 @@ def mypy(session: Session) -> None:
 @session(python=python_versions)
 def tests(session: Session) -> None:
     """Run the test suite."""
-    session.install(".[mutagen]")
-    session.install(
-        "coverage[toml]", "pytest", "pytest-asyncio", "pytest-mock", "pygments"
+    session.run_always(
+        "pdm",
+        "install",
+        "-G",
+        "mutagen",
+        "-G",
+        "tests",
+        "-G",
+        "coverage",
+        external=True,
     )
     try:
         session.run("coverage", "run", "--parallel", "-m", "pytest", *session.posargs)
@@ -173,9 +156,8 @@ def tests(session: Session) -> None:
 @session(python=python_versions[0])
 def coverage(session: Session) -> None:
     """Produce the coverage report."""
+    session.run_always("pdm", "install", "-G", "coverage", external=True)
     args = session.posargs or ["report"]
-
-    session.install("coverage[toml]")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -186,14 +168,26 @@ def coverage(session: Session) -> None:
 @session(python=python_versions[0])
 def typeguard(session: Session) -> None:
     """Runtime type checking using Typeguard."""
-    session.install(".[mutagen]")
-    session.install("pytest", "pytest-asyncio", "pytest-mock", "typeguard", "pygments")
+    session.run_always(
+        "pdm",
+        "install",
+        "-G",
+        "mutagen",
+        "-G",
+        "typeguard",
+        "-G",
+        "tests",
+        external=True,
+    )
     session.run("pytest", f"--typeguard-packages={package}", *session.posargs)
 
 
 @session(python=python_versions[0])
 def xdoctest(session: Session) -> None:
     """Run examples with xdoctest."""
+    session.run_always(
+        "pdm", "install", "-G", "mutagen", "-G", "xdoctest", external=True
+    )
     if session.posargs:
         args = [package, *session.posargs]
     else:
@@ -201,20 +195,16 @@ def xdoctest(session: Session) -> None:
         if "FORCE_COLOR" in os.environ:
             args.append("--colored=1")
 
-    session.install(".[mutagen]")
-    session.install("xdoctest[colors]")
     session.run("python", "-m", "xdoctest", *args)
 
 
 @session(name="docs-build", python=python_versions[0])
 def docs_build(session: Session) -> None:
     """Build the documentation."""
+    session.run_always("pdm", "install", "-G", "mutagen", "-G", "docs", external=True)
     args = session.posargs or ["docs", "docs/_build"]
     if not session.posargs and "FORCE_COLOR" in os.environ:
         args.insert(0, "--color")
-
-    session.install(".[mutagen]")
-    session.install("sphinx", "sphinx-click", "furo", "myst-parser")
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():
@@ -226,9 +216,8 @@ def docs_build(session: Session) -> None:
 @session(python=python_versions[0])
 def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
+    session.run_always("pdm", "install", "-G", "mutagen", "-G", "docs", external=True)
     args = session.posargs or ["--open-browser", "docs", "docs/_build"]
-    session.install(".[mutagen]")
-    session.install("sphinx", "sphinx-autobuild", "sphinx-click", "furo", "myst-parser")
 
     build_dir = Path("docs", "_build")
     if build_dir.exists():

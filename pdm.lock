@@ -5,7 +5,7 @@
 groups = ["default", "coverage", "dev", "docs", "lint", "mutagen", "mypy", "safety", "tests", "typeguard", "xdoctest"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:e45b521dbff1834a9e7aa8f2583a91818acc4e870244fdb16373e4d6ff4919b7"
+content_hash = "sha256:83dfaebb62e062d81d6ef7741d0ca067abe43bf9c10bde13f286df8ff3d89322"
 
 [[package]]
 name = "aiohttp"
@@ -1018,12 +1018,12 @@ files = [
 
 [[package]]
 name = "pathvalidate"
-version = "2.5.2"
-requires_python = ">=3.6"
+version = "3.2.0"
+requires_python = ">=3.7"
 summary = "pathvalidate is a Python library to sanitize/validate a string such as filenames/file-paths/etc."
 files = [
-    {file = "pathvalidate-2.5.2-py3-none-any.whl", hash = "sha256:e39a4dfacdba70e3a96d3e4c6ff617a39e991cf242e6e1f2017f1f67c3408d33"},
-    {file = "pathvalidate-2.5.2.tar.gz", hash = "sha256:5ff57d0fabe5ecb7a4f1e4957bfeb5ad8ab5ab4c0fa71f79c6bbc24bd9b7d14d"},
+    {file = "pathvalidate-3.2.0-py3-none-any.whl", hash = "sha256:cc593caa6299b22b37f228148257997e2fa850eea2daf7e4cc9205cef6908dee"},
+    {file = "pathvalidate-3.2.0.tar.gz", hash = "sha256:5e8378cf6712bff67fbe7a8307d99fa8c1a0cb28aa477056f8fc374f0dff24ad"},
 ]
 
 [[package]]

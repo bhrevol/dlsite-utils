@@ -1,18 +1,25 @@
 """Command-line interface."""
 import asyncio
+import io
 import os
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any, Iterable, Optional, TextIO, Tuple, cast
 
 import click
 import dlsite_async
+from PIL import Image, ImageFile
 from tqdm import tqdm
 
 from .archive import zip_work
 from .config import Config
 from .dlst import DlstFile, DlstInfo
+from .image import upscale as upscale_waifu2x
 from .rename import rename as _rename
 from .video import get_m3u8_urls
+
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 _LOCALES = {
@@ -251,6 +258,28 @@ def video_url(config: Config, product_id: Iterable[str]):
     for id_ in product_id:
         for filename, url in asyncio.run(get_m3u8_urls(id_)).items():
             click.echo(f"{filename}: {url}")
+
+
+@cli.command()
+@click.argument(
+    "file",
+    type=click.Path(exists=True, path_type=Path),
+    nargs=-1,
+)
+def upscale(file: Iterable[Path]):
+    file = list(file)
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        for f in tqdm(executor.map(_upscale_one, file), unit="file", total=len(file), desc="Upscaling"):
+            pass
+
+
+def _upscale_one(file: Path) -> Path:
+    im = Image.open(file)
+    if max(im.size) >= 2048:
+        return file
+    upscaled = upscale_waifu2x(im)
+    upscaled.save(file)
+    return file
 
 
 if __name__ == "__main__":

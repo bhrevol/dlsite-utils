@@ -21,6 +21,11 @@ _DEFAULT_CONFIG = f"""\
 #autotag_filename_pattern = {DEFAULT_FILENAME_PATTERN!r}
 #autotag_parent_pattern = {DEFAULT_PARENT_PATTERN!r}
 #autotag_zero_indexed_track = false
+#archive_excludes = [
+#  "*.DS_Store",
+#  "*.bak",
+#  "Thumbs.db",
+#]
 
 #[maker.RG1234]
 #autotag_filename_pattern = {DEFAULT_FILENAME_PATTERN!r}

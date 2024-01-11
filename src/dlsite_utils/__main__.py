@@ -8,9 +8,11 @@ import click
 import dlsite_async
 from tqdm import tqdm
 
+from .archive import zip_work
 from .config import Config
 from .dlst import DlstFile, DlstInfo
 from .rename import rename as _rename
+from .video import get_m3u8_urls
 
 
 _LOCALES = {
@@ -212,6 +214,43 @@ def autotag(
     locale = _LOCALES.get(language.lower()) if language else None
     for f in file:
         asyncio.run(_run(f))
+
+
+@cli.command()
+@click.argument(
+    "work_dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    nargs=-1,
+)
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    help="Overwrite existing tar archives.",
+)
+@pass_config
+def zip(config: Config, work_dir: Iterable[Path], force: bool) -> None:
+    """Compress work directory into a zip archive.
+
+    Archive will not be split (ZIP64 will be used if the resulting archive is >4GB in
+    size). All filenames in the archive will be encoded as UTF-8.
+    """
+    for work_path in work_dir:
+        with tqdm(unit="file") as pbar:
+            zip_work(work_path, force=force, config=config, pbar=pbar)
+
+
+@cli.command()
+@click.argument(
+    "product_id",
+    nargs=-1,
+)
+@pass_config
+def video_url(config: Config, product_id: Iterable[str]):
+    """Output video m3u8 playlist URL(s) suitable for downloading or streaming."""
+    for id_ in product_id:
+        for filename, url in asyncio.run(get_m3u8_urls(id_)).items():
+            click.echo(f"{filename}: {url}")
 
 
 if __name__ == "__main__":

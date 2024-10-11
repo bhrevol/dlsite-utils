@@ -1362,15 +1362,15 @@ files = [
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.23.2"
+version = "0.24.0"
 requires_python = ">=3.8"
 summary = "Pytest support for asyncio"
 dependencies = [
-    "pytest>=7.0.0",
+    "pytest<9,>=8.2",
 ]
 files = [
-    {file = "pytest-asyncio-0.23.2.tar.gz", hash = "sha256:c16052382554c7b22d48782ab3438d5b10f8cf7a4bdcae7f0f67f097d95beecc"},
-    {file = "pytest_asyncio-0.23.2-py3-none-any.whl", hash = "sha256:ea9021364e32d58f0be43b91c6233fb8d2224ccef2398d6837559e587682808f"},
+    {file = "pytest_asyncio-0.24.0-py3-none-any.whl", hash = "sha256:a811296ed596b69bf0b6f3dc40f83bcaf341b155a269052d82efa2b25ac7037b"},
+    {file = "pytest_asyncio-0.24.0.tar.gz", hash = "sha256:d081d828e576d85f875399194281e92bf8a68d60d72d1a2faf2feddb6c46b276"},
 ]
 
 [[package]]

@@ -2000,29 +2000,29 @@ files = [
 
 [[package]]
 name = "xdoctest"
-version = "1.1.2"
-requires_python = ">=3.6"
+version = "1.2.0"
+requires_python = ">=3.8"
 summary = "A rewrite of the builtin doctest module"
 files = [
-    {file = "xdoctest-1.1.2-py3-none-any.whl", hash = "sha256:ebe133222534f09597cbe461f97cc5f95ad7b36e5d31f3437caffb9baaddbddb"},
-    {file = "xdoctest-1.1.2.tar.gz", hash = "sha256:267d3d4e362547fa917d3deabaf6888232bbf43c8d30298faeb957dbfa7e0ba3"},
+    {file = "xdoctest-1.2.0-py3-none-any.whl", hash = "sha256:0f1ecf5939a687bd1fc8deefbff1743c65419cce26dff908f8b84c93fbe486bc"},
+    {file = "xdoctest-1.2.0.tar.gz", hash = "sha256:d8cfca6d8991e488d33f756e600d35b9fdf5efd5c3a249d644efcbbbd2ed5863"},
 ]
 
 [[package]]
 name = "xdoctest"
-version = "1.1.2"
+version = "1.2.0"
 extras = ["colors"]
-requires_python = ">=3.6"
+requires_python = ">=3.8"
 summary = "A rewrite of the builtin doctest module"
 dependencies = [
-    "Pygments; python_version < \"3.5.0\" and python_version >= \"2.7.0\"",
-    "Pygments; python_version >= \"3.5.0\"",
-    "colorama; platform_system == \"Windows\"",
-    "xdoctest==1.1.2",
+    "Pygments>=2.0.0; python_version < \"3.5.0\" and python_version >= \"2.7.0\"",
+    "Pygments>=2.4.1; python_version >= \"3.5.0\"",
+    "colorama>=0.4.1; platform_system == \"Windows\"",
+    "xdoctest==1.2.0",
 ]
 files = [
-    {file = "xdoctest-1.1.2-py3-none-any.whl", hash = "sha256:ebe133222534f09597cbe461f97cc5f95ad7b36e5d31f3437caffb9baaddbddb"},
-    {file = "xdoctest-1.1.2.tar.gz", hash = "sha256:267d3d4e362547fa917d3deabaf6888232bbf43c8d30298faeb957dbfa7e0ba3"},
+    {file = "xdoctest-1.2.0-py3-none-any.whl", hash = "sha256:0f1ecf5939a687bd1fc8deefbff1743c65419cce26dff908f8b84c93fbe486bc"},
+    {file = "xdoctest-1.2.0.tar.gz", hash = "sha256:d8cfca6d8991e488d33f756e600d35b9fdf5efd5c3a249d644efcbbbd2ed5863"},
 ]
 
 [[package]]

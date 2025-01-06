@@ -1,8 +1,8 @@
 """Command-line interface."""
 import asyncio
-import io
 import os
 from concurrent.futures import ProcessPoolExecutor
+from itertools import groupby
 from pathlib import Path
 from typing import Any, Iterable, Optional, TextIO, Tuple, cast
 
@@ -205,22 +205,32 @@ def autotag(
     config: Config, file: Iterable[Path], force: bool, language: str, dry_run: bool
 ) -> None:
     """Tag audio files based on DLsite work."""
+    from dlsite_async.work import Work
     from dlsite_utils.audio.tag import AudioTagger
 
-    async def _run(file: Path) -> None:
-        file = Path(os.path.abspath(file))
-        product_id = AudioTagger.find_product_id(file)
+    def _tag(tagger: AudioTagger, work: Work, f: Path, **kwargs) -> None:
+        click.echo(f"Tagging {f} -> {work.product_id} - {work.work_name}")
+        tags = tagger.tag(f, force=force, dry_run=dry_run, **kwargs)
+        for k, v in tags.items():  # type: ignore[no-untyped-call]
+            click.echo(f"  {k}: {v}")
+
+    async def _run(product_id: str, files: Iterable[Path]) -> None:
         async with dlsite_async.DlsiteAPI(locale=locale) as api:
             work = await api.get_work(product_id)
-            click.echo(f"Tagging {file} -> {work.product_id} - {work.work_name}")
             tagger = AudioTagger(work, config=config)
-            tags = tagger.tag(file, force=force, dry_run=dry_run)
-            for k, v in tags.items():  # type: ignore[no-untyped-call]
-                click.echo(f"  {k}: {v}")
+            sorted_, unsorted = tagger.sort_tracks(files)
+            for i, f in enumerate(sorted_, 1):
+                _tag(tagger, work, f, track_number=i)
+            for f in unsorted:
+                _tag(tagger, work, f)
 
     locale = _LOCALES.get(language.lower()) if language else None
-    for f in file:
-        asyncio.run(_run(f))
+    to_tag = sorted(
+        ((AudioTagger.find_product_id(f), f) for f in file),
+        key=lambda x: x[0],
+    )
+    for product_id, g in groupby(to_tag, lambda x: x[0]):
+        asyncio.run(_run(product_id, (f for _, f in g)))
 
 
 @cli.command()
@@ -244,7 +254,10 @@ def zip(config: Config, work_dir: Iterable[Path], force: bool) -> None:
     """
     for work_path in work_dir:
         with tqdm(unit="file") as pbar:
-            zip_work(work_path, force=force, config=config, pbar=pbar)
+            try:
+                zip_work(work_path, force=force, config=config, pbar=pbar)
+            except FileExistsError:
+                pass
 
 
 @cli.command()
@@ -268,8 +281,13 @@ def video_url(config: Config, product_id: Iterable[str]):
 )
 def upscale(file: Iterable[Path]):
     file = list(file)
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        for f in tqdm(executor.map(_upscale_one, file), unit="file", total=len(file), desc="Upscaling"):
+    with ProcessPoolExecutor(max_workers=2) as executor:
+        for f in tqdm(
+            executor.map(_upscale_one, file),
+            unit="file",
+            total=len(file),
+            desc="Upscaling",
+        ):
             pass
 
 

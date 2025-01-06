@@ -37,6 +37,10 @@ EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
 EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
     "organization", "LABEL"
 )
+EasyMP4Tags.RegisterFreeformKey(
+    "discsubtitle",
+    "DISCSUBTITLE",
+)
 
 
 DEFAULT_FILENAME_PATTERN = (
@@ -49,6 +53,7 @@ class TrackParts(NamedTuple):
     """Audio track name parts."""
 
     disc_number: Optional[int]
+    disc_subtitle: Optional[str]
     track_number: Optional[int]
     title: str
 
@@ -67,6 +72,7 @@ class _EasyTag(str, Enum):
     LABEL = "organization"
     TITLE = "title"
     TRACK_NUMBER = "tracknumber"
+    DISC_SUBTITLE = "discsubtitle"
 
 
 class _VorbisTag(str, Enum):
@@ -83,6 +89,7 @@ class _VorbisTag(str, Enum):
     LABEL = "label"
     TITLE = "title"
     TRACK_NUMBER = "tracknumber"
+    DISC_SUBTITLE = "discsubtitle"
 
 
 _Tags = Union[EasyID3, EasyMP4Tags, mutagen._vorbis.VCommentDict]
@@ -150,43 +157,70 @@ class AudioTagger:
             track numbers.
 
         Returns:
-            Tuple of (disc_number, track_number, title). Returned disc and track
+            Tuple of (disc_number, disc_subtitle, track_number, title). Returned disc and track
             numbers may be None.
         """
         path = Path(file_path)
         filename = unicodedata.normalize("NFKC", path.stem)
         title = filename
         m = self._title_re.match(filename)
+        disc_subtitle = None
         if m:
             try:
                 title = m.group("title")
+                title = title.strip() if title is not None else None
             except IndexError:
                 pass
             try:
                 disc = m.group("disc_number")
+                disc = disc.strip() if disc is not None else None
+                if disc and disc.isalpha():
+                    disc = ord(disc.lower()) - ord("a") + 1
             except IndexError:
                 disc = None
             try:
                 track = m.group("track_number")
+                track = track.strip() if track is not None else None
             except IndexError:
                 track = None
-            disc_number: Optional[int] = int(disc, 10) if disc is not None else None
+            if isinstance(disc, int):
+                disc_number: Optional[int] = disc
+            elif disc is not None:
+                disc_number = int(disc, 10)
+            else:
+                disc_number = None
             track_number: Optional[int] = int(track, 10) if track is not None else None
             if self._zero_indexed_track and track_number is not None:
                 track_number += 1
+            try:
+                disc_subtitle = m.group("disc_subtitle")
+                disc_subtitle = (
+                    disc_subtitle.strip() if disc_subtitle is not None else None
+                )
+            except IndexError:
+                pass
         else:
             disc_number = None
             track_number = None
+            disc_subtitle = None
         if path.parent and disc_number is None:
             parent = unicodedata.normalize("NFKC", path.parent.name)
             m = self._title_parent_re.match(parent)
             if m:
                 try:
                     disc = m.group("disc_number")
+                    disc = disc.strip() if disc is not None else None
                 except IndexError:
                     disc = None
                 disc_number = int(disc, 10) if disc is not None else None
-        return TrackParts(disc_number, track_number, title)
+                try:
+                    disc_subtitle = m.group("disc_subtitle")
+                    disc_subtitle = (
+                        disc_subtitle.strip() if disc_subtitle is not None else None
+                    )
+                except IndexError:
+                    pass
+        return TrackParts(disc_number, disc_subtitle, track_number, title)
 
     @staticmethod
     def find_product_id(file_path: Union[str, Path]) -> str:
@@ -223,6 +257,7 @@ class AudioTagger:
     def tag(
         self,
         file: Union[str, Path, BinaryIO],
+        track_number: Optional[int] = None,
         force: bool = False,
         dry_run: bool = False,
     ) -> _Tags:
@@ -247,6 +282,8 @@ class AudioTagger:
 
         Args:
             file: Audio file to tag.
+            track_number: Track number to use for the file (overrides regex
+                `track_number`).
             force: Replace existing tags.
             dry_run: If True, tags will not be written back to the file.
 
@@ -261,12 +298,17 @@ class AudioTagger:
         else:
             tags = deepcopy(audio_file.tags)
         self._tag_album(tags, tag_type, force=force)
-        disc_number, track_number, title = self.find_track_parts(path)
+        disc_number, disc_subtitle, track_number_, title = self.find_track_parts(path)
         self._set_tag(tags, tag_type.TITLE, title, force=force)
+        track_number = track_number_ if track_number is None else track_number
         if track_number is not None:
             self._set_tag(tags, tag_type.TRACK_NUMBER, str(track_number), force=force)
         if disc_number is not None:
             self._set_tag(tags, tag_type.DISC_NUMBER, str(disc_number), force=force)
+        if disc_subtitle is not None:
+            self._set_tag(
+                tags, tag_type.DISC_SUBTITLE, disc_subtitle.strip(), force=force
+            )
         if not dry_run:
             audio_file.tags = tags
             audio_file.save()
@@ -338,3 +380,27 @@ class AudioTagger:
         if self.work.label:
             return _make_label(self.work.label)
         return _make_label(self._get_circle())
+
+    def sort_tracks(
+        self, file_paths: Iterable[Union[str, Path]]
+    ) -> tuple[list[Path], list[Path]]:
+        """Sort tracks according to `track_sort`.
+
+        Returns:
+            Tuple of (sorted, unsorted).
+        """
+        to_sort: list[tuple[str, Path]] = []
+        unsorted: list[Path] = []
+        for file_path in file_paths:
+            path = Path(file_path)
+            filename = unicodedata.normalize("NFKC", path.stem)
+            m = self._title_re.match(filename)
+            if m:
+                try:
+                    track_sort = m.group("track_sort")
+                    to_sort.append((track_sort, path))
+                except IndexError:
+                    unsorted.append(path)
+            else:
+                unsorted.append(path)
+        return [p for _, p in sorted(to_sort, key=lambda t: t[0])], unsorted

@@ -31,6 +31,8 @@ STORE_FORMATS = {
     ".rar",
     ".wmv",
     ".zip",
+    ".exe",
+    ".dll",
 }
 
 

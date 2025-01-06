@@ -5,7 +5,7 @@
 groups = ["default", "coverage", "dev", "docs", "lint", "mutagen", "mypy", "safety", "tests", "typeguard", "xdoctest"]
 strategy = []
 lock_version = "4.5.0"
-content_hash = "sha256:147c485cbe4b95137e6acd2491366346bc8b80247284aa5aeaf6c6737e537f9e"
+content_hash = "sha256:8d4521bf3a32e9add910cc1c21f15c7ccdbc0f1323f171e8bcb4743f4cc9479c"
 
 [[metadata.targets]]
 requires_python = "~=3.10"
@@ -1122,12 +1122,12 @@ files = [
 
 [[package]]
 name = "pathvalidate"
-version = "2.5.2"
-requires_python = ">=3.6"
+version = "3.2.3"
+requires_python = ">=3.9"
 summary = "pathvalidate is a Python library to sanitize/validate a string such as filenames/file-paths/etc."
 files = [
-    {file = "pathvalidate-2.5.2-py3-none-any.whl", hash = "sha256:e39a4dfacdba70e3a96d3e4c6ff617a39e991cf242e6e1f2017f1f67c3408d33"},
-    {file = "pathvalidate-2.5.2.tar.gz", hash = "sha256:5ff57d0fabe5ecb7a4f1e4957bfeb5ad8ab5ab4c0fa71f79c6bbc24bd9b7d14d"},
+    {file = "pathvalidate-3.2.3-py3-none-any.whl", hash = "sha256:5eaf0562e345d4b6d0c0239d0f690c3bd84d2a9a3c4c73b99ea667401b27bee1"},
+    {file = "pathvalidate-3.2.3.tar.gz", hash = "sha256:59b5b9278e30382d6d213497623043ebe63f10e29055be4419a9c04c721739cb"},
 ]
 
 [[package]]

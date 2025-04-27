@@ -13,6 +13,7 @@ from PIL import Image, ImageFile
 from tqdm import tqdm
 
 from .archive import zip_work
+from .book import download as download_book
 from .config import Config
 from .dlst import DlstFile, DlstInfo
 from .image import upscale as upscale_waifu2x
@@ -299,6 +300,28 @@ def _upscale_one(file: Path) -> Path:
     upscaled = upscale_waifu2x(im)
     upscaled.save(file)
     return file
+
+
+@cli.command()
+@click.argument(
+    "product_id",
+    nargs=-1,
+)
+@click.option(
+    "-o",
+    "--output-dir",
+    type=click.Path(dir_okay=True, path_type=Path),
+)
+@pass_config
+def book(config: Config, product_id: Iterable[str], output_dir: Path | None):
+    """Download book work(s) from DLsite Play."""
+    for id_ in product_id:
+        asyncio.run(_book_one(id_, output_dir))
+
+
+async def _book_one(product_id: Iterable[str], output_dir: Path | None):
+    with tqdm() as pbar:
+        await download_book(product_id, output_dir=output_dir, pbar=pbar)
 
 
 if __name__ == "__main__":

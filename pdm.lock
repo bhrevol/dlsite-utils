@@ -5,7 +5,7 @@
 groups = ["default", "coverage", "dev", "docs", "lint", "mutagen", "mypy", "safety", "tests", "typeguard", "xdoctest"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:5a78bdd50397d2ee5f30571a4434d89de9a5fcb677975c3e5751e81e8b93e1bc"
+content_hash = "sha256:1f9ebf1a9ba3bcc99ac1c558294f8d4814bf2fb0a3b6901c4c7e97e055641e58"
 
 [[metadata.targets]]
 requires_python = "~=3.11"
@@ -557,6 +557,22 @@ dependencies = [
     "beautifulsoup4<5.0.0,>=4.11.1",
     "cryptography>=44.0.0",
     "lxml>=5.3.0",
+]
+files = [
+    {file = "dlsite_async-0.7.1-py3-none-any.whl", hash = "sha256:85fe12aeaf80ff1924036911a2c019a83f496a271a134ca0ed55faa0ebe15a0c"},
+    {file = "dlsite_async-0.7.1.tar.gz", hash = "sha256:670e309089b31c0a2a4e7c86051bebfeef8b0fe5f7c9ca3f1ef490a59e5cabab"},
+]
+
+[[package]]
+name = "dlsite-async"
+version = "0.7.1"
+extras = ["pil"]
+requires_python = "<4.0,>=3.10"
+summary = "DLsite Async"
+groups = ["default"]
+dependencies = [
+    "Pillow>=11.0.0",
+    "dlsite-async==0.7.1",
 ]
 files = [
     {file = "dlsite_async-0.7.1-py3-none-any.whl", hash = "sha256:85fe12aeaf80ff1924036911a2c019a83f496a271a134ca0ed55faa0ebe15a0c"},

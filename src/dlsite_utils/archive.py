@@ -5,7 +5,7 @@ import zipfile
 from fnmatch import fnmatch
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Iterable, Iterator, Optional, Tuple, Union
+from collections.abc import Iterable, Iterator
 
 from tqdm import tqdm
 
@@ -37,11 +37,11 @@ STORE_FORMATS = {
 
 
 def zip_work(
-    work_path: Union[str, Path],
-    archive_path: Optional[Union[str, Path]] = None,
+    work_path: str | Path,
+    archive_path: str | Path | None = None,
     force: bool = False,
-    config: Optional[Config] = None,
-    pbar: Optional[tqdm] = None,
+    config: Config | None = None,
+    pbar: tqdm | None = None,
 ) -> Path:
     """Archive and compress the specified work directory.
 
@@ -100,7 +100,7 @@ def zip_work(
 
 def _find_files(
     work_path: Path, excludes=Iterable[str]
-) -> Iterator[Tuple[Path, str, Optional[int]]]:
+) -> Iterator[tuple[Path, str, int | None]]:
     for root, dirs, files in work_path.walk():
         for file in files:
             arcname = (root / file).relative_to(work_path.parent)

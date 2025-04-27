@@ -1,6 +1,6 @@
 """Test cases for rename."""
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from dlsite_async import AgeCategory, Work
@@ -42,7 +42,7 @@ from .conftest import MockDlsiteAPI
 async def test_make_name(
     dlsite_api: MockDlsiteAPI,
     path: Path,
-    work_kwargs: Dict[str, Any],
+    work_kwargs: dict[str, Any],
     expected: str,
     mocker: MockerFixture,
 ) -> None:

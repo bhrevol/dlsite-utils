@@ -7,7 +7,8 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import PurePath
-from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Tuple, Union, cast
+from typing import Any, BinaryIO, cast
+from collections.abc import Iterator
 
 from .crypto import CTCryptAES
 
@@ -51,9 +52,9 @@ class DlstFile(AbstractContextManager["DlstFile"]):
 
     def __init__(
         self,
-        fobj: Union[BinaryIO, str, PurePath],
-        key: Optional[bytes] = None,
-        iv: Optional[bytes] = None,
+        fobj: BinaryIO | str | PurePath,
+        key: bytes | None = None,
+        iv: bytes | None = None,
     ):
         if isinstance(fobj, (str, PurePath)):
             fobj = open(fobj, "rb")
@@ -78,7 +79,7 @@ class DlstFile(AbstractContextManager["DlstFile"]):
 
         self._key = key
         self._iv: bytes = iv if iv else bytes([0] * 16)
-        self._chunk_ivs: Dict[DlstInfo, List[bytes]] = defaultdict(list)
+        self._chunk_ivs: dict[DlstInfo, list[bytes]] = defaultdict(list)
         self._lock = threading.Lock()
 
     @staticmethod
@@ -109,10 +110,10 @@ class DlstFile(AbstractContextManager["DlstFile"]):
         return CTCryptAES(self._key)
 
     @cached_property
-    def _name_info(self) -> Dict[str, DlstInfo]:
+    def _name_info(self) -> dict[str, DlstInfo]:
         return {info.name: info for info in self._filelist}
 
-    def _parse_directory(self) -> List[DlstInfo]:
+    def _parse_directory(self) -> list[DlstInfo]:
         fobj = self.fobj
         fobj.seek(self._dir_offset)
         data = fobj.read(12)
@@ -121,7 +122,7 @@ class DlstFile(AbstractContextManager["DlstFile"]):
             raise ValueError(f"unsupported archive directory: {magic!r}")
         _u32(data[4:])  # unused flags
         page_count = _u32(data[8:])
-        infos: List[DlstInfo] = []
+        infos: list[DlstInfo] = []
         for _ in range(page_count):
             data = fobj.read(556)
             name = data[36:].decode("utf-16").rstrip("\x00")
@@ -134,7 +135,7 @@ class DlstFile(AbstractContextManager["DlstFile"]):
     @staticmethod
     def _parse_entry_header(
         fobj: BinaryIO, offset: int, expected_data_size: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         pos = fobj.tell()
         fobj.seek(offset)
         header = fobj.read(36)
@@ -150,11 +151,11 @@ class DlstFile(AbstractContextManager["DlstFile"]):
         fobj.seek(pos)
         return data_offset, chunk_size
 
-    def infolist(self) -> List[DlstInfo]:
+    def infolist(self) -> list[DlstInfo]:
         """Return list of infos for files in this archive."""
         return self._filelist
 
-    def namelist(self) -> List[str]:
+    def namelist(self) -> list[str]:
         """Return list of string names for files in this archive."""
         return sorted(self._name_info.keys())
 
@@ -162,7 +163,7 @@ class DlstFile(AbstractContextManager["DlstFile"]):
         """Return info for the specified file name in this archive."""
         return self._name_info[name]
 
-    def read(self, name: Union[str, DlstInfo]) -> bytes:
+    def read(self, name: str | DlstInfo) -> bytes:
         """Read the bytes of the specfied file within this archive.
 
         Args:

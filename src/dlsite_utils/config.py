@@ -1,14 +1,11 @@
 """CLI config utilities."""
+import tomllib
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union, cast
+from typing import Any, cast
+from collections.abc import Iterator
 
 import platformdirs
 
-
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib  # type: ignore
 
 from .audio.tag import DEFAULT_FILENAME_PATTERN, DEFAULT_PARENT_PATTERN
 
@@ -37,7 +34,7 @@ _DEFAULT_CONFIG = f"""\
 class Config:
     """DLsite utils configuration."""
 
-    def __init__(self, data: dict[str, Any], path: Optional[Union[str, Path]] = None):
+    def __init__(self, data: dict[str, Any], path: str | Path | None = None):
         """Construct a new config.
 
         Args:
@@ -48,7 +45,7 @@ class Config:
         self._path = path
 
     @property
-    def path(self) -> Optional[str]:
+    def path(self) -> str | None:
         """Return config file path."""
         if self._path is not None:
             return str(self._path)
@@ -57,7 +54,7 @@ class Config:
     def get(
         self,
         option: str,
-        maker_id: Optional[str] = None,
+        maker_id: str | None = None,
         default: Any = None,
     ) -> Any:
         """Return the value of a configuration option.
@@ -90,7 +87,7 @@ class Config:
         return cast(dict[str, Any], self._data.get("maker", {}))
 
     @classmethod
-    def from_file(cls, file_path: Optional[Union[str, Path]] = None) -> "Config":
+    def from_file(cls, file_path: str | Path | None = None) -> "Config":
         """Load a config from the specified file.
 
         Args:
@@ -107,7 +104,7 @@ class Config:
         return Path(platformdirs.user_config_dir(_APP_NAME)) / "config.toml"
 
     @classmethod
-    def _load(cls, file_path: Optional[Union[str, Path]] = None) -> dict[str, Any]:
+    def _load(cls, file_path: str | Path | None = None) -> dict[str, Any]:
         """Load configuration file.
 
         Args:
@@ -131,7 +128,7 @@ class Config:
 
     @staticmethod
     def init_default(
-        file_path: Union[str, Path],
+        file_path: str | Path,
         make_parents: bool = True,
         force: bool = False,
     ) -> None:

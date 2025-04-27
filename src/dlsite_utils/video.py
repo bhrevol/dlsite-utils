@@ -1,4 +1,3 @@
-from typing import Optional
 from urllib.parse import urlencode
 
 from dlsite_async import PlayAPI
@@ -6,8 +5,8 @@ from dlsite_async import PlayAPI
 
 async def get_m3u8_urls(
     product_id: str,
-    login_id: Optional[str] = None,
-    password: Optional[str] = None,
+    login_id: str | None = None,
+    password: str | None = None,
     **kwargs,
 ) -> dict[str, str]:
     """Return .m3u8 playlist URLs for all videos in a work."""

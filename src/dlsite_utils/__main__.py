@@ -4,7 +4,8 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 from itertools import groupby
 from pathlib import Path
-from typing import Any, Iterable, Optional, TextIO, Tuple, cast
+from typing import Any, TextIO, cast
+from collections.abc import Iterable
 
 import click
 import dlsite_async
@@ -42,7 +43,7 @@ pass_config = click.make_pass_decorator(Config)
     help="Use the specified configuration file instead of the default config file.",
 )
 @click.pass_context
-def cli(ctx: click.Context, config: Optional[Path]) -> None:
+def cli(ctx: click.Context, config: Path | None) -> None:
     """DLsite utilities."""  # noqa: D403
     ctx.obj = Config.from_file(config)
 
@@ -95,7 +96,7 @@ def config(config: Config, list_: bool) -> None:
 def rename(
     config: Config,
     path: Iterable[Path],
-    language: Optional[str],
+    language: str | None,
     force: bool,
     dry_run: bool,
 ) -> None:
@@ -124,15 +125,15 @@ def rename(
 def dlst_extract(
     config: Config,
     dlst_file: Path,
-    key: Optional[str],
-    iv: Optional[str],
-    key_file: Optional[click.File],
+    key: str | None,
+    iv: str | None,
+    key_file: click.File | None,
 ) -> None:
     """Extract images from DLST file.
 
     If --key or --key-file are not provided, will default to using 'keys.yml'.
     """
-    biv: Optional[bytes] = None
+    biv: bytes | None = None
     if key:
         bkey = bytes.fromhex(key)
     else:  # pragma: no cover
@@ -165,7 +166,7 @@ def _dlst_extract_one(
         fobj.write(data)
 
 
-def _load_keys(fobj: TextIO) -> Tuple[bytes, Optional[bytes]]:  # pragma: no cover
+def _load_keys(fobj: TextIO) -> tuple[bytes, bytes | None]:  # pragma: no cover
     from ruamel.yaml import YAML
 
     data = YAML().load(fobj)

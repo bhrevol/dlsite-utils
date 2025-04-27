@@ -45,9 +45,6 @@ asyncio_mode = "auto"
 coverage = [
     "coverage[toml]>=7.4.0"
 ]
-dev = [
-    "nox>=2023.4.22",
-]
 docs = [
     "furo>=2023.9.10",
     "myst-parser>=2.0.0",
@@ -80,14 +77,14 @@ xdoctest = [
 includes = []
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py311"
 
 [project]
 authors = [
     {name = "byeonhyeok", email = "bhrevol@gmail.com"},
 ]
 license = {text = "MIT"}
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "click>=8.0.1",
     "dlsite-async<1.0.0,>=0.2.0",
@@ -97,7 +94,6 @@ dependencies = [
     "ruamel-yaml<1.0.0,>=0.18.0",
     "tqdm<5.0.0,>=4.64.1",
     "platformdirs<4.4.0,>=4.3.6",
-    "tomli<3.0.0,>=2.0.1; python_version < \"3.11\"",
     "Pillow>=10.1.0",
 ]
 name = "dlsite-utils"
@@ -121,3 +117,9 @@ mutagen = [
 
 [project.scripts]
 dlsite = "dlsite_utils.__main__:cli"
+
+[dependency-groups]
+dev = [
+    "nox>=2023.4.22",
+    "pyupgrade>=3.19.1",
+]

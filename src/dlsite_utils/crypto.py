@@ -1,5 +1,4 @@
 """Crytography module."""
-from typing import Optional
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -29,7 +28,7 @@ class CTCryptAES:
     def encrypt(
         self,
         data: bytes,
-        iv: Optional[bytes] = None,
+        iv: bytes | None = None,
     ) -> bytes:
         """CBC encrypt data.
 
@@ -54,7 +53,7 @@ class CTCryptAES:
         ciphertext += encryptor.finalize()
         return ciphertext[:-padding]
 
-    def decrypt(self, data: bytes, iv: Optional[bytes] = None) -> bytes:
+    def decrypt(self, data: bytes, iv: bytes | None = None) -> bytes:
         """CBC decrypt data.
 
         Args:

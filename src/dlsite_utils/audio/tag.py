@@ -5,7 +5,8 @@ import unicodedata
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, BinaryIO, Iterable, NamedTuple, Optional, Union
+from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple, Optional, Union
+from collections.abc import Iterable
 
 
 try:
@@ -52,9 +53,9 @@ DEFAULT_PARENT_PATTERN = r"^(?P<disc_number>\d+).*$"
 class TrackParts(NamedTuple):
     """Audio track name parts."""
 
-    disc_number: Optional[int]
-    disc_subtitle: Optional[str]
-    track_number: Optional[int]
+    disc_number: int | None
+    disc_subtitle: str | None
+    track_number: int | None
     title: str
 
 
@@ -146,7 +147,7 @@ class AudioTagger:
             return _EasyTag
         raise ValueError("Unsupported file type.")
 
-    def find_track_parts(self, file_path: Union[str, Path]) -> TrackParts:  # noqa: C901
+    def find_track_parts(self, file_path: str | Path) -> TrackParts:  # noqa: C901
         """Try to parse a filename into track information.
 
         Args:
@@ -184,12 +185,12 @@ class AudioTagger:
             except IndexError:
                 track = None
             if isinstance(disc, int):
-                disc_number: Optional[int] = disc
+                disc_number: int | None = disc
             elif disc is not None:
                 disc_number = int(disc, 10)
             else:
                 disc_number = None
-            track_number: Optional[int] = int(track, 10) if track is not None else None
+            track_number: int | None = int(track, 10) if track is not None else None
             if self._zero_indexed_track and track_number is not None:
                 track_number += 1
             try:
@@ -223,7 +224,7 @@ class AudioTagger:
         return TrackParts(disc_number, disc_subtitle, track_number, title)
 
     @staticmethod
-    def find_product_id(file_path: Union[str, Path]) -> str:
+    def find_product_id(file_path: str | Path) -> str:
         """Try to find a DLsite product ID for the specified path.
 
         Args:
@@ -256,8 +257,8 @@ class AudioTagger:
 
     def tag(
         self,
-        file: Union[str, Path, BinaryIO],
-        track_number: Optional[int] = None,
+        file: str | Path | BinaryIO,
+        track_number: int | None = None,
         force: bool = False,
         dry_run: bool = False,
     ) -> _Tags:
@@ -361,7 +362,7 @@ class AudioTagger:
         )
 
     @staticmethod
-    def _multistring(tags: _Tags, strings: Iterable[str]) -> Union[str, list[str]]:
+    def _multistring(tags: _Tags, strings: Iterable[str]) -> str | list[str]:
         if isinstance(tags, EasyMP4Tags):
             return "; ".join(strings)
         return list(strings)
@@ -382,7 +383,7 @@ class AudioTagger:
         return _make_label(self._get_circle())
 
     def sort_tracks(
-        self, file_paths: Iterable[Union[str, Path]]
+        self, file_paths: Iterable[str | Path]
     ) -> tuple[list[Path], list[Path]]:
         """Sort tracks according to `track_sort`.
 

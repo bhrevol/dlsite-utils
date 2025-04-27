@@ -4,7 +4,6 @@ import shutil
 import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Literal
 
 from PIL import Image
 
@@ -16,7 +15,7 @@ def _find_waifu2x() -> Path:
     return Path(waifu2x).resolve()
 
 
-def upscale(im: Image, scale: int=2) -> Image:
+def upscale(im: Image, scale: int = 2) -> Image:
     """Upscale an image using waifu2x.
 
     If waifu2x is not available in PATH the original image will be returned.

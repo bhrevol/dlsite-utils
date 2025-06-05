@@ -172,7 +172,7 @@ files = [
 
 [[package]]
 name = "authlib"
-version = "1.5.2"
+version = "1.6.0"
 requires_python = ">=3.9"
 summary = "The ultimate Python library in building OAuth and OpenID Connect servers and clients."
 groups = ["safety"]
@@ -180,8 +180,8 @@ dependencies = [
     "cryptography",
 ]
 files = [
-    {file = "authlib-1.5.2-py2.py3-none-any.whl", hash = "sha256:8804dd4402ac5e4a0435ac49e0b6e19e395357cfa632a3f624dcb4f6df13b4b1"},
-    {file = "authlib-1.5.2.tar.gz", hash = "sha256:fe85ec7e50c5f86f1e2603518bb3b4f632985eb4a355e52256530790e326c512"},
+    {file = "authlib-1.6.0-py2.py3-none-any.whl", hash = "sha256:91685589498f79e8655e8a8947431ad6288831d643f11c55c2143ffcc738048d"},
+    {file = "authlib-1.6.0.tar.gz", hash = "sha256:4367d32031b7af175ad3a323d571dc7257b7099d55978087ceae4a0d88cd3210"},
 ]
 
 [[package]]
@@ -354,7 +354,7 @@ version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
 groups = ["default", "dev", "docs", "safety", "tests", "xdoctest"]
-marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
+marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -828,13 +828,13 @@ files = [
 
 [[package]]
 name = "joblib"
-version = "1.5.0"
+version = "1.5.1"
 requires_python = ">=3.9"
 summary = "Lightweight pipelining with Python functions"
 groups = ["safety"]
 files = [
-    {file = "joblib-1.5.0-py3-none-any.whl", hash = "sha256:206144b320246485b712fc8cc51f017de58225fa8b414a1fe1764a7231aca491"},
-    {file = "joblib-1.5.0.tar.gz", hash = "sha256:d8757f955389a3dd7a23152e43bc297c2e0c2d3060056dad0feefc88a06939b5"},
+    {file = "joblib-1.5.1-py3-none-any.whl", hash = "sha256:4719a31f054c7d766948dcd83e9613686b27114f190f717cec7eaa2084f8a74a"},
+    {file = "joblib-1.5.1.tar.gz", hash = "sha256:f4f86e351f39fe3d0d32a9f2c3d8af1ee4cec285aafcb27003dda5205576b444"},
 ]
 
 [[package]]
@@ -1776,7 +1776,7 @@ files = [
 
 [[package]]
 name = "safety"
-version = "3.5.1"
+version = "3.5.2"
 requires_python = ">=3.8"
 summary = "Scan dependencies for known vulnerabilities and licenses."
 groups = ["safety"]
@@ -1803,8 +1803,8 @@ dependencies = [
     "typing-extensions>=4.7.1",
 ]
 files = [
-    {file = "safety-3.5.1-py3-none-any.whl", hash = "sha256:535bba9e2c274fcabc508db7005407fc348635b29e516a68bb515a686f8e03d9"},
-    {file = "safety-3.5.1.tar.gz", hash = "sha256:7fde2dbb497f2a167fe2dd864c8ab3296bbcd6e8a4f0490b047d5c84a60a653f"},
+    {file = "safety-3.5.2-py3-none-any.whl", hash = "sha256:d5baff410c548393e80ba2bd2ab1de2701a690ca3577e457335917b9db4641e1"},
+    {file = "safety-3.5.2.tar.gz", hash = "sha256:ecbb2e76f9574284f2c0e168e71ec92b39018ae9516b3b00f132de57ecaa09cb"},
 ]
 
 [[package]]
@@ -1827,13 +1827,13 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "80.7.1"
+version = "80.9.0"
 requires_python = ">=3.9"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
 groups = ["safety"]
 files = [
-    {file = "setuptools-80.7.1-py3-none-any.whl", hash = "sha256:ca5cc1069b85dc23070a6628e6bcecb3292acac802399c7f8edc0100619f9009"},
-    {file = "setuptools-80.7.1.tar.gz", hash = "sha256:f6ffc5f0142b1bd8d0ca94ee91b30c0ca862ffd50826da1ea85258a06fd94552"},
+    {file = "setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922"},
+    {file = "setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c"},
 ]
 
 [[package]]
@@ -2069,19 +2069,19 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.15.4"
+version = "0.16.0"
 requires_python = ">=3.7"
 summary = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 groups = ["safety"]
 dependencies = [
-    "click<8.2,>=8.0.0",
+    "click>=8.0.0",
     "rich>=10.11.0",
     "shellingham>=1.3.0",
     "typing-extensions>=3.7.4.3",
 ]
 files = [
-    {file = "typer-0.15.4-py3-none-any.whl", hash = "sha256:eb0651654dcdea706780c466cf06d8f174405a659ffff8f163cfbfee98c0e173"},
-    {file = "typer-0.15.4.tar.gz", hash = "sha256:89507b104f9b6a0730354f27c39fae5b63ccd0c95b1ce1f1a6ba0cfd329997c3"},
+    {file = "typer-0.16.0-py3-none-any.whl", hash = "sha256:1f79bed11d4d02d4310e3c1b7ba594183bcedb0ac73b27a9e5f28f6fb5b98855"},
+    {file = "typer-0.16.0.tar.gz", hash = "sha256:af377ffaee1dbe37ae9440cb4e8f11686ea5ce4e9bae01b84ae7c63b87f1dd3b"},
 ]
 
 [[package]]

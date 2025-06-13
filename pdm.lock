@@ -439,6 +439,7 @@ summary = "Code coverage measurement for Python"
 groups = ["coverage"]
 dependencies = [
     "coverage==7.9.0",
+    "coverage==7.9.0",
     "tomli; python_full_version <= \"3.11.0a6\"",
 ]
 files = [
@@ -585,6 +586,7 @@ summary = "DLsite Async"
 groups = ["default"]
 dependencies = [
     "Pillow>=11.0.0",
+    "dlsite-async==0.7.1",
     "dlsite-async==0.7.1",
 ]
 files = [
@@ -2145,6 +2147,7 @@ dependencies = [
     "Pygments>=2.0.0; python_version < \"3.5.0\" and python_version >= \"2.7.0\"",
     "Pygments>=2.4.1; python_version >= \"3.5.0\"",
     "colorama>=0.4.1; platform_system == \"Windows\"",
+    "xdoctest==1.2.0",
     "xdoctest==1.2.0",
 ]
 files = [

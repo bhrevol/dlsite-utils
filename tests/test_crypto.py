@@ -1,4 +1,5 @@
 """Cryptography tests."""
+
 from dlsite_utils.crypto import CTCryptAES
 
 

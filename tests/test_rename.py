@@ -1,12 +1,12 @@
 """Test cases for rename."""
+
 from pathlib import Path
 from typing import Any
 
 import pytest
 from dlsite_async import AgeCategory, Work
-from pytest_mock import MockerFixture
-
 from dlsite_utils.rename import _make_name, rename
+from pytest_mock import MockerFixture
 
 from .conftest import MockDlsiteAPI
 

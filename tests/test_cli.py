@@ -1,11 +1,11 @@
 """Test cases for CLI."""
+
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from pytest_mock import MockerFixture
-
 from dlsite_utils.__main__ import cli
+from pytest_mock import MockerFixture
 
 
 @pytest.fixture

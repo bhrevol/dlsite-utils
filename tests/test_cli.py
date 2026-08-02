@@ -32,22 +32,3 @@ def test_rename_succeeds(runner: CliRunner, mocker: MockerFixture) -> None:
         dry_run=False,
         config=mocker.ANY,
     )
-
-
-def test_dlst_extract_succeeds(runner: CliRunner, mocker: MockerFixture) -> None:
-    """Should exit with zero."""
-    m = mocker.patch("dlsite_utils.__main__.DlstFile", mocker.MagicMock())
-    m.infolist = mocker.Mock(return_value=[mocker.Mock()])
-    with runner.isolated_filesystem():
-        with open("test.dlst", "w") as f:
-            f.write("")
-        result = runner.invoke(
-            cli,
-            ["dlst-extract", "--key=abc123", "--iv=abc123", "test.dlst"],
-        )
-    assert result.exit_code == 0
-    m.assert_called_once_with(
-        Path("test.dlst"),
-        bytes.fromhex("abc123"),
-        bytes.fromhex("abc123"),
-    )

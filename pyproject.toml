@@ -51,9 +51,6 @@ lint = [
 mypy = [
     "mypy>=1.8.0"
 ]
-safety = [
-    "safety>=2.3.5"
-]
 typeguard = [
     "typeguard>=4.1.5",
 ]

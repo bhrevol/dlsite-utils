@@ -59,7 +59,7 @@ def voicecomic_to_mp4(
                 raise ValueError("Invalid orientation")
             audio_path = path / f"{page}.mp4"
             probe = ffmpeg.probe(str(audio_path))
-            duration = 0
+            duration = 0.0
             for stream in probe.get("streams", []):
                 if stream.get("codec_type") != "audio":
                     continue

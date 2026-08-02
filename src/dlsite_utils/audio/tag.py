@@ -40,16 +40,16 @@ EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
 EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
     "organization", "LABEL"
 )
-EasyMP4Tags.RegisterFreeformKey(
+EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
     "discsubtitle",
     "DISCSUBTITLE",
 )
-EasyMP4Tags.RegisterFreeformKey(
+EasyMP4Tags.RegisterFreeformKey(  # type: ignore[no-untyped-call]
     "artists",
     "ARTISTS",
 )
 
-EasyID3.RegisterTXXXKey("artists", "ARTISTS")
+EasyID3.RegisterTXXXKey("artists", "ARTISTS")  # type: ignore[no-untyped-call]
 
 
 DEFAULT_FILENAME_PATTERN = (
@@ -179,7 +179,7 @@ class AudioTagger:
         if m:
             try:
                 title = m.group("title")
-                title = title.strip() if title is not None else None
+                title = title.strip() if title is not None else ""
             except IndexError:
                 pass
             try:
@@ -437,15 +437,15 @@ class AudioTagger:
         mp4 = mutagen.File(file)
         if not isinstance(mp4, MP4):
             return
-        if force or "covr" not in mp4.tags:
+        if force or "covr" not in mp4.tags:  # type: ignore[operator]
             cover_art = Path(cover_art)
             with open(cover_art, "rb") as f:
-                cover = MP4Cover(
+                cover = MP4Cover(  # type: ignore[no-untyped-call]
                     f.read(),
                     MP4Cover.FORMAT_PNG
                     if cover_art.suffix.lower() == ".png"
                     else MP4Cover.FORMAT_JPEG,
                 )
-                mp4.tags["covr"] = [cover]
+                mp4.tags["covr"] = [cover]  # type: ignore[index]
         if not dry_run:
-            mp4.save()
+            mp4.save()  # type: ignore[no-untyped-call]

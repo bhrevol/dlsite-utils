@@ -14,17 +14,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { python: "3.13", os: "ubuntu-latest", session: "pre-commit" }
-          - { python: "3.13", os: "ubuntu-latest", session: "safety" }
-          - { python: "3.13", os: "ubuntu-latest", session: "mypy" }
+          - { python: "3.14", os: "ubuntu-latest", session: "pre-commit" }
+          - { python: "3.14", os: "ubuntu-latest", session: "mypy" }
+          - { python: "3.14", os: "ubuntu-latest", session: "tests" }
+          - { python: "3.14", os: "windows-latest", session: "tests" }
+          - { python: "3.14", os: "macos-latest", session: "tests" }
+          - { python: "3.14", os: "ubuntu-latest", session: "typeguard" }
+          - { python: "3.14", os: "ubuntu-latest", session: "xdoctest" }
+          - { python: "3.14", os: "ubuntu-latest", session: "docs-build" }
           - { python: "3.13", os: "ubuntu-latest", session: "tests" }
           - { python: "3.12", os: "ubuntu-latest", session: "tests" }
-          - { python: "3.11", os: "ubuntu-latest", session: "tests" }
-          - { python: "3.13", os: "windows-latest", session: "tests" }
-          - { python: "3.13", os: "macos-latest", session: "tests" }
-          - { python: "3.13", os: "ubuntu-latest", session: "typeguard" }
-          - { python: "3.13", os: "ubuntu-latest", session: "xdoctest" }
-          - { python: "3.13", os: "ubuntu-latest", session: "docs-build" }
 
     env:
       NOXSESSION: ${{ matrix.session }}
@@ -33,16 +32,16 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
       - name: Upgrade pip
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
+          pip install --constraint=${{ github.workspace }}/.github/workflows/constraints.txt pip
           pip --version
 
       - name: Upgrade pip in virtual environments
@@ -56,12 +55,12 @@ jobs:
 
       - name: Install PDM
         run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt pdm
+          pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt pdm
           pdm --version
 
       - name: Install Nox
         run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt nox
+          pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt nox
           nox --version
 
       - name: Compute pre-commit cache key
@@ -80,7 +79,7 @@ jobs:
           print("::set-output name=result::{}".format(result))
 
       - name: Restore pre-commit cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         if: matrix.session == 'pre-commit'
         with:
           path: ~/.cache/pre-commit
@@ -94,7 +93,7 @@ jobs:
 
       - name: Upload coverage data
         if: always() && matrix.session == 'tests'
-        uses: "actions/upload-artifact@v4"
+        uses: "actions/upload-artifact@v7"
         with:
           name: coverage-data-${{ matrix.python }}-${{ matrix.os }}
           path: ".coverage.*"
@@ -102,7 +101,7 @@ jobs:
 
       - name: Upload documentation
         if: matrix.session == 'docs-build'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs/_build
@@ -112,30 +111,30 @@ jobs:
     needs: tests
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
       - name: Upgrade pip
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
+          pip install --constraint=${{ github.workspace }}/.github/workflows/constraints.txt pip
           pip --version
 
       - name: Install PDM
         run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt pdm
+          pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt pdm
           pdm --version
 
       - name: Install Nox
         run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt nox
+          pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt nox
           nox --version
 
       - name: Download coverage data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -149,4 +148,36 @@ jobs:
           nox --session=coverage -- xml
 
       - name: Upload coverage report
-        uses: codecov/codecov-action@v5.5.5
+        uses: codecov/codecov-action@v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=${{ github.workspace }}/.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Install PDM
+        run: |
+          pipx install --pip-args=--constraint=${{ github.workspace }}/.github/workflows/constraints.txt pdm
+          pdm --version
+
+      - name: Generate production requirements.txt
+        run: |
+          pdm export -o requirements.txt --without-hashes --prod -G pil
+
+      - name: Run pip-audit
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          inputs: requirements.txt

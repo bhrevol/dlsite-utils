@@ -1,14 +1,17 @@
 """Rename DLsite work files and dirs."""
-from aiohttp import ClientResponseError
+
+import re
+import unicodedata
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, cast
 
 import click
-import re
+from aiohttp import ClientResponseError
 from dlsite_async import DlsiteAPI
 from dlsite_async.exceptions import InvalidIDError
 from dlsite_async.utils import find_product_id
 from pathvalidate import sanitize_filename
+from tqdm import tqdm
 
 from .utils import configure_work
 
@@ -23,20 +26,37 @@ async def rename(
     force: bool = False,
     dry_run: bool = False,
     config: Optional["Config"] = None,
+    pbar: tqdm | None = None,
 ) -> None:
     """Rename path according to DLsite work info."""
     try:
-        name = await _make_name(api, path, config)
+        name = unicodedata.normalize("NFC", await _make_name(api, path, config))
     except InvalidIDError:  # pragma: no cover
-        click.secho(f"{path} does not appear to be a DLsite work.", fg="red")
+        msg = f"{path} does not appear to be a DLsite work."
+        if pbar is not None:
+            pbar.write(msg)
+        else:
+            click.secho(msg, fg="red")
         return
     new_path = path.parent / name
     if new_path == path:
-        click.echo(f"Skipping {path}")
+        msg = f"Skipping {path}"
+        if pbar is not None:
+            pbar.write(msg)
+        else:
+            click.echo(msg)
         return
-    click.echo(f"Renaming {path} to {new_path}")
+    msg = f"Renaming {path} to {new_path}"
+    if pbar is not None:
+        pbar.write(msg)
+    else:
+        click.echo(msg)
     if new_path.exists() and not force:
-        click.secho(f"{new_path} already exists.", fg="red")
+        msg = f"{new_path} already exists."
+        if pbar is not None:
+            pbar.write(msg)
+        else:
+            click.secho(msg, fg="red")
         return
     if not dry_run:
         path.replace(new_path)

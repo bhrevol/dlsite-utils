@@ -1,30 +1,74 @@
 """CLI config utilities."""
+
 import tomllib
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, cast
-from collections.abc import Iterator
 
 import platformdirs
-
 
 from .audio.tag import DEFAULT_FILENAME_PATTERN, DEFAULT_PARENT_PATTERN
 
 
 _APP_NAME = "dlsite-utils"
 
+_EXAMPLE_WORK_NAME_PATTERN = r"^(【[^】]*】)*(?P<work_name>[^【]*)(【.*】)?$"
 _DEFAULT_CONFIG = f"""\
 # dlsite-utils TOML configuration file
 
+#######################
+# Default configuration
+#######################
+
+# Default regex pattern to use when converting audio file name to audio track tags.
+# Any matching regex groups will be used as the specified audio file tag.
+#
+# Supported regex groups:
+# - title (any string)
+# - track_number (integer track number)
+# - track_sort (any string, see note below)
+# - disc_number (integer disc number)
+# - disc_subtitle (any string)
+#
+# When using track_sort, all matching audio files in a directory will be lexically sorted
+# (in ascending order) and then assigned track numbers in that order.
+# This may be useful when tagging audio works by circles which use filenames like 1-a...,
+# 1-b..., 2-a..., etc.
 #autotag_filename_pattern = {DEFAULT_FILENAME_PATTERN!r}
+
+# Default regex pattern to use when converting parent directory name to audio track tags.
+# Supported regex groups are the same as autotag_filename_pattern (filename level matches
+# take precedence over parent directory matches).
 #autotag_parent_pattern = {DEFAULT_PARENT_PATTERN!r}
+
+# When autotag_zero_indexed_track is set to true, tag numbers converted from file names
+# will be incremented by 1. This may be useful if your audio player assumes audio track
+# numbers always start at 1 (and does not sort a 0 (zero) track number correctly).
 #autotag_zero_indexed_track = false
-#archive_excludes = [
-#  "*.DS_Store",
-#  "*.bak",
-#  "Thumbs.db",
-#]
+
+######################################
+# Circle/Maker specific configurations
+######################################
+
+# Circle/Maker configurations can be set by adding additional [maker.RGxxxx]
+# sections to this file (where RGxxxx is the circle/maker ID.
 
 #[maker.RG1234]
+
+# Regex pattern to use when converting DLsite work name to album title
+# (in `dlsite autotag`) and when renaming a file or directory (in `dlsite rename`).
+# Pattern must contain the group `work_name` which will be used intead of the full DLsite
+# work name. This may be useful if you wish to remove extraneous portions of a work title
+# (such as tags or sale ads placed within  【】 braces ).
+#work_name_pattern = {_EXAMPLE_WORK_NAME_PATTERN!r}
+
+# Circle/Maker name to use for this maker (overrides current DLsite circle/maker name for
+# works by this maker). This may be useful for consistency when tagging or renaming works
+# by circles which have changed their name.
+#circle_name_override = ''
+
+# autotag_... settings behave the same as in the default configuration, but are only
+# applied to works by this maker (and take precedence over any defaults).
 #autotag_filename_pattern = {DEFAULT_FILENAME_PATTERN!r}
 #autotag_parent_pattern = {DEFAULT_PARENT_PATTERN!r}
 #autotag_zero_indexed_track = false

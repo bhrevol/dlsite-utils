@@ -1,24 +1,25 @@
 """Command-line interface."""
+
 import asyncio
 import os
+import tempfile
+import unicodedata
+from collections.abc import Iterable
 from concurrent.futures import ProcessPoolExecutor
 from itertools import groupby
 from pathlib import Path
 from typing import Any, TextIO, cast
-from collections.abc import Iterable
 
+import aiohttp
 import click
 import dlsite_async
+from bs4 import BeautifulSoup
 from PIL import Image, ImageFile
 from tqdm import tqdm
 
-from .archive import zip_work
-from .book import download as download_book
 from .config import Config
-from .dlst import DlstFile, DlstInfo
-from .image import upscale as upscale_waifu2x
+from .play import download as download_play
 from .rename import rename as _rename
-from .video import get_m3u8_urls
 
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -115,71 +116,15 @@ def rename(
 
 
 @cli.command()
-@click.option("-k", "--key", help="AES key")
-@click.option("-i", "--iv", help="AES IV")
-@click.option("--key-file", type=click.File(), help="YAML key file.")
-@click.argument(
-    "dlst_file",
-    type=click.Path(exists=True, path_type=Path),
-)
-@pass_config
-def dlst_extract(
-    config: Config,
-    dlst_file: Path,
-    key: str | None,
-    iv: str | None,
-    key_file: click.File | None,
-) -> None:
-    """Extract images from DLST file.
-
-    If --key or --key-file are not provided, will default to using 'keys.yml'.
-    """
-    biv: bytes | None = None
-    if key:
-        bkey = bytes.fromhex(key)
-    else:  # pragma: no cover
-        try:
-            if key_file:
-                bkey, biv = _load_keys(cast(TextIO, key_file))
-            else:
-                with open("keys.yml") as fobj:
-                    bkey, biv = _load_keys(fobj)
-        except (KeyError, FileNotFoundError):
-            click.secho("No valid key file found")
-            return
-    if iv:  # pragma: no cover
-        biv = bytes.fromhex(iv)
-
-    with DlstFile(dlst_file, bkey, biv) as dlst:
-        pbar = tqdm([info for info in dlst.infolist() if info.name != "index.bin"])
-        for info in pbar:  # pragma: no cover
-            _dlst_extract_one(dlst, info, dlst_file.parent / dlst_file.stem, pbar)
-
-
-def _dlst_extract_one(
-    dlst: DlstFile, info: DlstInfo, output_dir: Path, pbar: tqdm
-) -> None:  # pragma: no cover
-    if not output_dir.exists():
-        os.makedirs(output_dir)
-    pbar.set_description(f"Extracting {info.name}")
-    data = dlst.read(info)
-    with open(output_dir / info.name, "wb") as fobj:
-        fobj.write(data)
-
-
-def _load_keys(fobj: TextIO) -> tuple[bytes, bytes | None]:  # pragma: no cover
-    from ruamel.yaml import YAML
-
-    data = YAML().load(fobj)
-    iv = data.get("iv")
-    return bytes.fromhex(data["key"]), bytes.fromhex(iv) if iv else None
-
-
-@cli.command()
 @click.argument(
     "file",
-    type=click.Path(exists=True, path_type=Path),
+    type=click.Path(path_type=Path),
     nargs=-1,
+)
+@click.option(
+    "-c",
+    "--cover-art",
+    type=click.Path(path_type=Path),
 )
 @click.option(
     "-f",
@@ -204,15 +149,23 @@ def _load_keys(fobj: TextIO) -> tuple[bytes, bytes | None]:  # pragma: no cover
 )
 @pass_config
 def autotag(
-    config: Config, file: Iterable[Path], force: bool, language: str, dry_run: bool
+    config: Config,
+    file: Iterable[Path],
+    cover_art: Path | None,
+    force: bool,
+    language: str,
+    dry_run: bool,
 ) -> None:
-    """Tag audio files based on DLsite work."""
+    """Tag .mp3 and .m4a audio files based on DLsite work."""
     from dlsite_async.work import Work
+
     from dlsite_utils.audio.tag import AudioTagger
 
     def _tag(tagger: AudioTagger, work: Work, f: Path, **kwargs) -> None:
         click.echo(f"Tagging {f} -> {work.product_id} - {work.work_name}")
-        tags = tagger.tag(f, force=force, dry_run=dry_run, **kwargs)
+        tags = tagger.tag(
+            f, cover_art=cover_art, force=force, dry_run=dry_run, **kwargs
+        )
         for k, v in tags.items():  # type: ignore[no-untyped-call]
             click.echo(f"  {k}: {v}")
 
@@ -237,69 +190,29 @@ def autotag(
 
 @cli.command()
 @click.argument(
-    "work_dir",
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    nargs=-1,
-)
-@click.option(
-    "-f",
-    "--force",
-    is_flag=True,
-    help="Overwrite existing tar archives.",
-)
-@pass_config
-def zip(config: Config, work_dir: Iterable[Path], force: bool) -> None:
-    """Compress work directory into a zip archive.
-
-    Archive will not be split (ZIP64 will be used if the resulting archive is >4GB in
-    size). All filenames in the archive will be encoded as UTF-8.
-    """
-    for work_path in work_dir:
-        with tqdm(unit="file") as pbar:
-            try:
-                zip_work(work_path, force=force, config=config, pbar=pbar)
-            except FileExistsError:
-                pass
-
-
-@cli.command()
-@click.argument(
     "product_id",
     nargs=-1,
 )
-@pass_config
-def video_url(config: Config, product_id: Iterable[str]):
-    """Output video m3u8 playlist URL(s) suitable for downloading or streaming."""
-    for id_ in product_id:
-        for filename, url in asyncio.run(get_m3u8_urls(id_)).items():
-            click.echo(f"{filename}: {url}")
-
-
-@cli.command()
-@click.argument(
-    "file",
-    type=click.Path(exists=True, path_type=Path),
-    nargs=-1,
+@click.option(
+    "-o",
+    "--output-dir",
+    type=click.Path(dir_okay=True, path_type=Path),
 )
-def upscale(file: Iterable[Path]):
-    file = list(file)
-    with ProcessPoolExecutor(max_workers=2) as executor:
-        for f in tqdm(
-            executor.map(_upscale_one, file),
-            unit="file",
-            total=len(file),
-            desc="Upscaling",
-        ):
-            pass
+@pass_config
+def dl_play(config: Config, product_id: Iterable[str], output_dir: Path | None):
+    """Download supported work(s) from DLsite Play.
+
+    Currently supports downloading book (manga/CG) and voicecomic works, plus standalone
+    (web optimized) image and audio files. If a work contains other file types they will
+    not be downloaded.
+    """
+    for id_ in product_id:
+        asyncio.run(_dl_play_one(id_, output_dir))
 
 
-def _upscale_one(file: Path) -> Path:
-    im = Image.open(file)
-    if max(im.size) >= 2048:
-        return file
-    upscaled = upscale_waifu2x(im)
-    upscaled.save(file)
-    return file
+async def _dl_play_one(product_id: Iterable[str], output_dir: Path | None):
+    with tqdm() as pbar:
+        await download_play(product_id, output_dir=output_dir, pbar=pbar)
 
 
 @cli.command()
@@ -313,16 +226,121 @@ def _upscale_one(file: Path) -> Path:
     type=click.Path(dir_okay=True, path_type=Path),
 )
 @pass_config
-def book(config: Config, product_id: Iterable[str], output_dir: Path | None):
-    """Download book work(s) from DLsite Play."""
-    for id_ in product_id:
-        asyncio.run(_book_one(id_, output_dir))
+def dl(config: Config, product_id: Iterable[str], output_dir: Path | None):
+    """Download purchased work(s) from DLsite.
+
+    Work must be downloadable as .zip (or legacy multipart .rar).
+    For DLsite Play/browser only works, use dl-play instead.
+    """
+    asyncio.run(_dl(product_id, output_dir))
 
 
-async def _book_one(product_id: Iterable[str], output_dir: Path | None):
-    with tqdm() as pbar:
-        await download_book(product_id, output_dir=output_dir, pbar=pbar)
+async def _dl(product_ids: Iterable[str], output_dir: Path | None, **kwargs: Any):
+    async with dlsite_async.PlayAPI() as play:
+        await play.login()
+        for id_ in product_ids:
+            try:
+                await _dl_one(play, id_, output_dir, **kwargs)
+            except FileExistsError:
+                click.echo("Skipped download for {product_id}: {e} already exists")
 
 
-if __name__ == "__main__":
-    cli(prog_name="dlsite")  # pragma: no cover
+async def _dl_one(
+    play: dlsite_async.PlayAPI,
+    product_id: str,
+    output_dir: Path | None,
+    force: bool = False,
+):
+    url = "https://play.dlsite.com/api/v3/download"
+    async with play.get(
+        url, params={"workno": product_id}, timeout=play._DL_TIMEOUT
+    ) as response:
+        if response.content_disposition:
+            # single zip download
+            return await _dl_atomic(
+                play, response, f"{product_id}.zip", output_dir, force=force
+            )
+
+        # legacy split rar download
+        async def _dl_part(url: str, part: int) -> None:
+            async with play.get(url, timeout=play._DL_TIMEOUT) as part_response:
+                await _dl_atomic(
+                    play,
+                    part_response,
+                    f"{product_id}.part{part}.rar",
+                    output_dir,
+                    force=force,
+                )
+
+        soup = BeautifulSoup(await response.text(), "lxml")
+        parts = [a.get("href") for a in soup.find_all("a", class_="btn_dl split")]
+        await asyncio.gather(
+            *(_dl_part(url, i) for i, url in enumerate(parts, start=1))
+        )
+
+
+async def _dl_atomic(
+    play: dlsite_async.PlayAPI,
+    response: aiohttp.ClientResponse,
+    default_filename: str,
+    output_dir: Path | None,
+    force: bool = False,
+) -> None:
+    dest_dir = Path(output_dir) if output_dir else Path.cwd()
+    filename = response.content_disposition.filename or default_filename
+    dest = dest_dir / filename
+    if not force and dest.exists():
+        raise FileExistsError(str(dest))
+    if not dest.parent.exists():
+        dest.parent.mkdir(parents=True)
+    with tempfile.NamedTemporaryFile(
+        prefix=dest.name, dir=dest.parent, delete=False
+    ) as temp:
+        with tqdm(
+            desc=f"Downloading {filename}",
+            total=response.content_length,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            leave=True,
+        ) as pbar:
+            try:
+                async for chunk in response.content.iter_chunked(play._DL_CHUNK_SIZE):
+                    temp.write(chunk)
+                    pbar.update(len(chunk))
+            except Exception:
+                temp.close()
+                os.remove(temp.name)
+                raise
+    os.replace(temp.name, dest)
+
+
+@cli.command()
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Force overwriting existing paths.",
+)
+@click.argument(
+    "voicecomic_dir",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False, path_type=Path),
+    nargs=-1,
+)
+def vc2mp4(voicecomic_dir: Iterable[Path], force: bool) -> None:
+    """Convert DLsite Play voicecomic(s) to mp4 video.
+
+    voicecomic_dir should be the path to a DLsite Play voicecomic directory downloaded
+    with dl-play.
+
+    Requires ffmpeg.
+    """
+    from .voicecomic import voicecomic_to_mp4
+
+    for p in voicecomic_dir:
+        try:
+            dest = voicecomic_to_mp4(p, force=force)
+            click.echo(f"Converted {p} -> {dest}")
+        except FileExistsError as e:
+            click.secho(f"Failed to convert {p}: {e}", color="red")

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from typing import Any, Literal
@@ -13,7 +15,7 @@ async def download(
     output_dir: str | Path | None = None,
     login_id: str | None = None,
     password: str | None = None,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
     **kwargs: Any,
 ) -> None:
     """Download the specified work from DLsite Play."""
@@ -65,12 +67,12 @@ async def _download_ebook(
     tree: ZipTree,
     filename: str,
     playfile: PlayFile,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     ebook_dir, name = os.path.splitext(filename)
     async with EbookSession(play, tree, playfile) as ebook:
         if pbar is None:
-            it: range | "tqdm[Any]" = range(ebook.page_count)
+            it: range | tqdm[Any] = range(ebook.page_count)
         else:
             it = tqdm(range(ebook.page_count), f"Downloading {filename}", unit="page")
         for i in it:
@@ -94,12 +96,12 @@ async def _download_epub_fixed(
     filename: str,
     playfile: PlayFile,
     convert: Literal["jpg", "png"] | None = None,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     epub_dir, _ = os.path.splitext(filename)
     async with EpubFixedSession(play, tree, playfile) as epub:
         if pbar is None:
-            it: range | "tqdm[Any]" = range(epub.page_count)
+            it: range | tqdm[Any] = range(epub.page_count)
         else:
             it = tqdm(range(epub.page_count), f"Downloading {filename}", unit="page")
         for i in it:
@@ -124,7 +126,7 @@ async def _download_epub_reflowable(
     tree: ZipTree,
     filename: str,
     playfile: PlayFile,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     dest = output_dir / filename
     async with EpubReflowableSession(play, tree, playfile) as epub:
@@ -140,7 +142,7 @@ async def _download_playfile(
     tree: ZipTree,
     filename: str,
     playfile: PlayFile,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     orig_path, _ = os.path.splitext(filename)
     _, ext = os.path.splitext(playfile.optimized_name)
@@ -160,11 +162,11 @@ async def _download_pdf(
     tree: ZipTree,
     filename: str,
     playfile: PlayFile,
-    pbar: "tqdm[Any]" | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     pages = playfile.files.get("page", [])
     if pbar is None:
-        it: enumerate[Any] | "tqdm[Any]" = enumerate(pages)
+        it: enumerate[Any] | tqdm[Any] = enumerate(pages)
     else:
         it = tqdm(enumerate(pages), desc=f"Downloading {filename}", unit="page")
     for i, page in it:

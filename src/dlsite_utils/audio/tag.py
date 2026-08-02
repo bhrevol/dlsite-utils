@@ -1,12 +1,13 @@
 """Audio tag module."""
+
 import os
 import re
 import unicodedata
+from collections.abc import Iterable
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple, Optional, Union
-from collections.abc import Iterable
 
 
 try:
@@ -23,6 +24,7 @@ from mutagen.easyid3 import EasyID3
 from mutagen.easymp4 import EasyMP4, EasyMP4Tags
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3
+from mutagen.mp4 import MP4, MP4Cover, MP4Tags
 
 from ..utils import configure_work
 
@@ -42,6 +44,12 @@ EasyMP4Tags.RegisterFreeformKey(
     "discsubtitle",
     "DISCSUBTITLE",
 )
+EasyMP4Tags.RegisterFreeformKey(
+    "artists",
+    "ARTISTS",
+)
+
+EasyID3.RegisterTXXXKey("artists", "ARTISTS")
 
 
 DEFAULT_FILENAME_PATTERN = (
@@ -65,6 +73,7 @@ class _EasyTag(str, Enum):
     ALBUM = "album"
     ALBUM_ARTIST = "albumartist"
     ARTIST = "artist"
+    ARTISTS = "artists"
     CATALOG_NUMBER = "catalognumber"
     COMPOSER = "composer"
     DATE = "date"
@@ -82,6 +91,7 @@ class _VorbisTag(str, Enum):
     ALBUM = "album"
     ALBUM_ARTIST = "albumartist"
     ARTIST = "artist"
+    ARTISTS = "artists"
     CATALOG_NUMBER = "catalognumber"
     COMPOSER = "composer"
     DATE = "date"
@@ -259,6 +269,7 @@ class AudioTagger:
         self,
         file: str | Path | BinaryIO,
         track_number: int | None = None,
+        cover_art: str | Path | None = None,
         force: bool = False,
         dry_run: bool = False,
     ) -> _Tags:
@@ -285,6 +296,7 @@ class AudioTagger:
             file: Audio file to tag.
             track_number: Track number to use for the file (overrides regex
                 `track_number`).
+            cover_art: Path to image to use as cover art.
             force: Replace existing tags.
             dry_run: If True, tags will not be written back to the file.
 
@@ -313,6 +325,8 @@ class AudioTagger:
         if not dry_run:
             audio_file.tags = tags
             audio_file.save()
+        if cover_art is not None and isinstance(audio_file, EasyMP4):
+            self._set_mp4_cover(file, cover_art, dry_run=dry_run, force=force)
         return tags
 
     def _tag_album(
@@ -333,6 +347,13 @@ class AudioTagger:
             ),
             **kwargs,
         )
+        if self.work.voice_actor:
+            self._set_tag(
+                tags,
+                tag_type.ARTISTS,
+                [s.strip() for s in self.work.voice_actor],
+                **kwargs,
+            )
         self._set_tag(tags, tag_type.CATALOG_NUMBER, self.work.product_id, **kwargs)
         if self.work.music:
             self._set_tag(
@@ -364,7 +385,7 @@ class AudioTagger:
     @staticmethod
     def _multistring(tags: _Tags, strings: Iterable[str]) -> str | list[str]:
         if isinstance(tags, EasyMP4Tags):
-            return "; ".join(strings)
+            return "; ".join(s.strip() for s in strings)
         return list(strings)
 
     def _get_genre(self) -> str:
@@ -405,3 +426,26 @@ class AudioTagger:
             else:
                 unsorted.append(path)
         return [p for _, p in sorted(to_sort, key=lambda t: t[0])], unsorted
+
+    def _set_mp4_cover(
+        self,
+        file: str | Path | BinaryIO,
+        cover_art: str | Path,
+        force: bool = False,
+        dry_run: bool = False,
+    ) -> None:
+        mp4 = mutagen.File(file)
+        if not isinstance(mp4, MP4):
+            return
+        if force or "covr" not in mp4.tags:
+            cover_art = Path(cover_art)
+            with open(cover_art, "rb") as f:
+                cover = MP4Cover(
+                    f.read(),
+                    MP4Cover.FORMAT_PNG
+                    if cover_art.suffix.lower() == ".png"
+                    else MP4Cover.FORMAT_JPEG,
+                )
+                mp4.tags["covr"] = [cover]
+        if not dry_run:
+            mp4.save()

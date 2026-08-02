@@ -1,60 +1,77 @@
 # DLsite Utilities
 
-[![PyPI](https://img.shields.io/pypi/v/dlsite-utils.svg)][pypi status]
-[![Status](https://img.shields.io/pypi/status/dlsite-utils.svg)][pypi status]
-[![Python Version](https://img.shields.io/pypi/pyversions/dlsite-utils)][pypi status]
-[![License](https://img.shields.io/pypi/l/dlsite-utils)][license]
-
-[![Read the documentation at https://dlsite-utils.readthedocs.io/](https://img.shields.io/readthedocs/dlsite-utils/latest.svg?label=Read%20the%20Docs)][read the docs]
-[![Tests](https://github.com/bhrevol/dlsite-utils/workflows/Tests/badge.svg)][tests]
-[![Codecov](https://codecov.io/gh/bhrevol/dlsite-utils/branch/main/graph/badge.svg)][codecov]
-
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)][black]
-
-[pypi status]: https://pypi.org/project/dlsite-utils/
-[read the docs]: https://dlsite-utils.readthedocs.io/
-[tests]: https://github.com/bhrevol/dlsite-utils/actions?workflow=Tests
-[codecov]: https://app.codecov.io/gh/bhrevol/dlsite-utils
-[pre-commit]: https://github.com/pre-commit/pre-commit
-[black]: https://github.com/psf/black
-
 Assorted utilities for managing DLsite works.
+Mainly provided as example of ways to use [dlsite-async].
+
+Utilities are opinionated towards author's use case and provided as-is.
 
 ## Features
 
-- `dlsite rename`: Rename files/directories based on DLsite work circle/title
-- `dlsite dlst-extract`: Extract contents of DLST files.
-  - Requires CypherTec DRM AES128 key and IV used to encrypt the file.
-- `dlsite autotag`: Automatically tag audio files based on DLsite work.
+- `dlsite autotag`: Automatically tag `.mp3` and `.m4a` audio files based on DLsite work.
   - Requires `dlsite-utils[mutagen]` extras.
+- `dlsite dl`: Download `.zip` or `.rar` files for supported works from DLsite.
+  - Requires valid account with credentials set via netrc.
+- `dlsite dl-play`: Download browser versions of supported works from DLsite Play.
+  - Requires valid account with credentials set via netrc.
+- `dlsite rename`: Rename files/directories based on DLsite work circle/title
+  - Only supports works which are visible in the DLsite API (does not check Play API for
+    Play exclusive works).
+- `dlsite vc2mp4`: Convert DLsite Play voicecomics to `.mp4` video.
+  - Requires `ffmpeg` in your environment `PATH`.
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.12+
 
 ## Installation
 
-You can install _DLsite Utilities_ via [pip] from [PyPI]:
+Must be installed from source.
+
+[pipx] can be used to install in a standalone environment directly from Github:
 
 ```console
-$ pip install dlsite-utils
+$ pipx install "dlsite-async[mutagen] @ git+https://github.com/bhrevol/dlsite-utils.git"
 ```
 
-To install _Dlsite Utilities_ with optional dependencies:
+Alternatively, clone this git repository and then install using [pdm] or [pip].
 
 ```console
-$ pip install dlsite-utils[mutagen]
+$ git clone https://github.com/bhrevol/dlsite-utils
+$ cd dlsite-utils
+$ pdm install
+```
+
+```console
+$ pip install .[mutagen]
 ```
 
 ## Usage
 
-Please see the [Command-line Reference] for details.
+```console
+$ dlsite --help
+Usage: dlsite [OPTIONS] COMMAND [ARGS]...
 
-## Contributing
+  DLsite utilities.
 
-Contributions are very welcome.
-To learn more, see the [Contributor Guide].
+Options:
+  --version          Show the version and exit.
+  -c, --config FILE  Use the specified configuration file instead of the
+                     default config file.
+  --help             Show this message and exit.
+
+Commands:
+  autotag    Tag .mp3 and .m4a audio files based on DLsite work.
+  config     Print the config file location.
+  dl         Download purchased work(s) from DLsite.
+  dl-play    Download supported work(s) from DLsite Play.
+  rename     Rename paths based on DLsite work information.
+  vc2mp4     Convert DLsite Play voicecomic(s) to mp4 video.
+```
+
+### Configuration
+
+Configuration to adjust `autotag` and `rename` behavior is done via a config file.
+See the default config file (which can be found using `dlsite config`).
 
 ## License
 
@@ -66,11 +83,6 @@ License v2.0 or later. If you redistribute _dlsite-utils_ with the optional
 `mutagen` extra included, your redistribution must comply with the terms of the
 GPL v2.0 or later.
 
-## Issues
-
-If you encounter any problems,
-please [file an issue] along with a detailed description.
-
 ## Credits
 
 This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter] template.
@@ -80,7 +92,9 @@ This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter]
 [hypermodern python cookiecutter]: https://github.com/cjolowicz/cookiecutter-hypermodern-python
 [file an issue]: https://github.com/bhrevol/dlsite-utils/issues
 [pip]: https://pip.pypa.io/
+[pdm]: https://pdm-project.org/
 [mutagen]: https://github.com/quodlibet/mutagen
+[dlsite-async]: https://github.com/bhrevol/dlsite-async
 
 <!-- github-only -->
 

@@ -26,7 +26,7 @@ async def rename(
     force: bool = False,
     dry_run: bool = False,
     config: Optional["Config"] = None,
-    pbar: tqdm[Any] | None = None,
+    pbar: "tqdm[Any]" | None = None,
 ) -> None:
     """Rename path according to DLsite work info."""
     try:

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 def configure_work(work: Work, config: Optional["Config"]) -> Work:
     """Return a new copy of `work` with `config` applied."""
     work_name = work.work_name
-    circle_name_override: str | None = None
+    circle = work.circle
     if config:
         name_pattern: str = config.get(
             "work_name_pattern", maker_id=work.maker_id, default=""
@@ -30,5 +30,5 @@ def configure_work(work: Work, config: Optional["Config"]) -> Work:
             "circle_name_override", maker_id=work.maker_id, default=work.circle
         )
         if circle_name_override:
-            work.circle = circle_name_override
-    return replace(work, work_name=work_name, circle=circle_name_override)
+            circle = circle_name_override
+    return replace(work, work_name=work_name, circle=circle)

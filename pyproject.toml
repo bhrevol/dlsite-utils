@@ -23,7 +23,7 @@ show_error_codes = true
 show_error_context = true
 
 [[tool.mypy.overrides]]
-module = ["tqdm"]
+module = ["ffmpeg"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -50,12 +50,6 @@ lint = [
 ]
 mypy = [
     "mypy>=1.8.0"
-]
-tests = [
-    "pygments>=2.17.2",
-    "pytest>=7.4.3",
-    "pytest-asyncio<1.0.0,>=0.21.0",
-    "pytest-mock<4.0.0,>=3.8.2",
 ]
 safety = [
     "safety>=2.3.5"
@@ -128,3 +122,11 @@ dev = [
     "pyupgrade>=3.19.1",
 ]
 mutagen = ["mutagen"]
+tests = [
+    "pygments>=2.17.2",
+    "pytest>=7.4.3",
+    "pytest-asyncio<1.0.0,>=0.21.0",
+    "pytest-mock<4.0.0,>=3.8.2",
+    "types-tqdm>=4.70.0.20260731",
+    "types-lxml>=2026.2.16",
+]

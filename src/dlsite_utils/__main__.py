@@ -161,7 +161,7 @@ def autotag(
 
     from dlsite_utils.audio.tag import AudioTagger
 
-    def _tag(tagger: AudioTagger, work: Work, f: Path, **kwargs) -> None:
+    def _tag(tagger: AudioTagger, work: Work, f: Path, **kwargs: Any) -> None:
         click.echo(f"Tagging {f} -> {work.product_id} - {work.work_name}")
         tags = tagger.tag(
             f, cover_art=cover_art, force=force, dry_run=dry_run, **kwargs
@@ -199,7 +199,7 @@ def autotag(
     type=click.Path(dir_okay=True, path_type=Path),
 )
 @pass_config
-def dl_play(config: Config, product_id: Iterable[str], output_dir: Path | None):
+def dl_play(config: Config, product_id: Iterable[str], output_dir: Path | None) -> None:
     """Download supported work(s) from DLsite Play.
 
     Currently supports downloading book (manga/CG) and voicecomic works, plus standalone
@@ -210,7 +210,7 @@ def dl_play(config: Config, product_id: Iterable[str], output_dir: Path | None):
         asyncio.run(_dl_play_one(id_, output_dir))
 
 
-async def _dl_play_one(product_id: Iterable[str], output_dir: Path | None):
+async def _dl_play_one(product_id: str, output_dir: Path | None) -> None:
     with tqdm() as pbar:
         await download_play(product_id, output_dir=output_dir, pbar=pbar)
 
@@ -226,7 +226,7 @@ async def _dl_play_one(product_id: Iterable[str], output_dir: Path | None):
     type=click.Path(dir_okay=True, path_type=Path),
 )
 @pass_config
-def dl(config: Config, product_id: Iterable[str], output_dir: Path | None):
+def dl(config: Config, product_id: Iterable[str], output_dir: Path | None) -> None:
     """Download purchased work(s) from DLsite.
 
     Work must be downloadable as .zip (or legacy multipart .rar).
@@ -235,7 +235,9 @@ def dl(config: Config, product_id: Iterable[str], output_dir: Path | None):
     asyncio.run(_dl(product_id, output_dir))
 
 
-async def _dl(product_ids: Iterable[str], output_dir: Path | None, **kwargs: Any):
+async def _dl(
+    product_ids: Iterable[str], output_dir: Path | None, **kwargs: Any
+) -> None:
     async with dlsite_async.PlayAPI() as play:
         await play.login()
         for id_ in product_ids:
@@ -250,7 +252,7 @@ async def _dl_one(
     product_id: str,
     output_dir: Path | None,
     force: bool = False,
-):
+) -> None:
     url = "https://play.dlsite.com/api/v3/download"
     async with play.get(
         url, params={"workno": product_id}, timeout=play._DL_TIMEOUT
@@ -275,7 +277,7 @@ async def _dl_one(
         soup = BeautifulSoup(await response.text(), "lxml")
         parts = [a.get("href") for a in soup.find_all("a", class_="btn_dl split")]
         await asyncio.gather(
-            *(_dl_part(url, i) for i, url in enumerate(parts, start=1))
+            *(_dl_part(str(url), i) for i, url in enumerate(parts, start=1) if url)
         )
 
 
@@ -287,7 +289,10 @@ async def _dl_atomic(
     force: bool = False,
 ) -> None:
     dest_dir = Path(output_dir) if output_dir else Path.cwd()
-    filename = response.content_disposition.filename or default_filename
+    if response.content_disposition:
+        filename = response.content_disposition.filename or default_filename
+    else:
+        filename = default_filename
     dest = dest_dir / filename
     if not force and dest.exists():
         raise FileExistsError(str(dest))
@@ -343,4 +348,4 @@ def vc2mp4(voicecomic_dir: Iterable[Path], force: bool) -> None:
             dest = voicecomic_to_mp4(p, force=force)
             click.echo(f"Converted {p} -> {dest}")
         except FileExistsError as e:
-            click.secho(f"Failed to convert {p}: {e}", color="red")
+            click.secho(f"Failed to convert {p}: {e}", fg="red")

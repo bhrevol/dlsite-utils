@@ -3,7 +3,7 @@
 import re
 import unicodedata
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 import click
 from aiohttp import ClientResponseError
@@ -26,7 +26,7 @@ async def rename(
     force: bool = False,
     dry_run: bool = False,
     config: Optional["Config"] = None,
-    pbar: tqdm | None = None,
+    pbar: tqdm[Any] | None = None,
 ) -> None:
     """Rename path according to DLsite work info."""
     try:
@@ -90,6 +90,4 @@ async def _make_name(
     suffix = "".join(
         suffix for suffix in path.suffixes if re.match(r"^[.A-Za-z0-9]+$", suffix)
     )
-    return cast(
-        str, sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")
-    )
+    return sanitize_filename(f"{work.product_id} - {circle}{work.work_name}{suffix}")

@@ -2226,13 +2226,13 @@ files = [
 
 [[package]]
 name = "types-tqdm"
-version = "4.70.0.20260805"
+version = "4.70.0.20260827"
 requires_python = ">=3.10"
 summary = "Typing stubs for tqdm"
 groups = ["tests"]
 files = [
-    {file = "types_tqdm-4.70.0.20260805-py3-none-any.whl", hash = "sha256:c83113470a46caee2d045428554714f3c314be94eb4ed4030aaa8a8ab21b830c"},
-    {file = "types_tqdm-4.70.0.20260805.tar.gz", hash = "sha256:569efd0fd8b2a460e6e6548634ec253c1362ed8907f8b0daacf0a07eab204a26"},
+    {file = "types_tqdm-4.70.0.20260827-py3-none-any.whl", hash = "sha256:d6e02da8ec2bc11124e02d4bc84bd8b67a444f4c5decf544846897c8272c7023"},
+    {file = "types_tqdm-4.70.0.20260827.tar.gz", hash = "sha256:d3efd69243ac9093c552f1c0d081b77286d61ace96b6899a142542555bdad2dc"},
 ]
 
 [[package]]

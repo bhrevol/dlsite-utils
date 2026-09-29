@@ -789,7 +789,7 @@ files = [
 
 [[package]]
 name = "dlsite-async"
-version = "0.11.0"
+version = "0.11.1"
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
@@ -801,24 +801,24 @@ dependencies = [
     "typing-extensions>=4.15.0",
 ]
 files = [
-    {file = "dlsite_async-0.11.0-py3-none-any.whl", hash = "sha256:e5b688d9b5739a0789e84fa38f18a5c574bafe49592baf350e8bca27644f1bf6"},
-    {file = "dlsite_async-0.11.0.tar.gz", hash = "sha256:65d1b22a20e242ca655401a3beaf3d4e6c4941edcd99cdc5b99431d081ffa980"},
+    {file = "dlsite_async-0.11.1-py3-none-any.whl", hash = "sha256:7b0e7a53913f495bda36b8f9761057c09c8d9a7afd3963118a7059570d500fc5"},
+    {file = "dlsite_async-0.11.1.tar.gz", hash = "sha256:16d10e40e20048fd00b94186575181c7d0b64046b3ace7e880f20a0b1bd7c087"},
 ]
 
 [[package]]
 name = "dlsite-async"
-version = "0.11.0"
+version = "0.11.1"
 extras = ["pil"]
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
 dependencies = [
     "Pillow>=11.0.0",
-    "dlsite-async==0.11.0",
+    "dlsite-async==0.11.1",
 ]
 files = [
-    {file = "dlsite_async-0.11.0-py3-none-any.whl", hash = "sha256:e5b688d9b5739a0789e84fa38f18a5c574bafe49592baf350e8bca27644f1bf6"},
-    {file = "dlsite_async-0.11.0.tar.gz", hash = "sha256:65d1b22a20e242ca655401a3beaf3d4e6c4941edcd99cdc5b99431d081ffa980"},
+    {file = "dlsite_async-0.11.1-py3-none-any.whl", hash = "sha256:7b0e7a53913f495bda36b8f9761057c09c8d9a7afd3963118a7059570d500fc5"},
+    {file = "dlsite_async-0.11.1.tar.gz", hash = "sha256:16d10e40e20048fd00b94186575181c7d0b64046b3ace7e880f20a0b1bd7c087"},
 ]
 
 [[package]]

@@ -876,8 +876,8 @@ files = [
 
 [[package]]
 name = "dependency-groups"
-version = "1.3.1"
-requires_python = ">=3.8"
+version = "1.3.2"
+requires_python = ">=3.9"
 summary = "A tool for resolving PEP 735 Dependency Group data"
 groups = ["dev"]
 dependencies = [
@@ -885,18 +885,18 @@ dependencies = [
     "tomli; python_version < \"3.11\"",
 ]
 files = [
-    {file = "dependency_groups-1.3.1-py3-none-any.whl", hash = "sha256:51aeaa0dfad72430fcfb7bcdbefbd75f3792e5919563077f30bc0d73f4493030"},
-    {file = "dependency_groups-1.3.1.tar.gz", hash = "sha256:78078301090517fd938c19f64a53ce98c32834dfe0dee6b88004a569a6adfefd"},
+    {file = "dependency_groups-1.3.2-py3-none-any.whl", hash = "sha256:8c337f7b92445823b0d0ea507f611390c58dcd2112be00aebcd738a2ca7a1c64"},
+    {file = "dependency_groups-1.3.2.tar.gz", hash = "sha256:c81831f43828dbc3987ee247eb198241a0152b8e7ceab10977cc3808eb388ac7"},
 ]
 
 [[package]]
 name = "distlib"
-version = "0.4.3"
+version = "0.4.4"
 summary = "Distribution utilities"
 groups = ["dev", "lint"]
 files = [
-    {file = "distlib-0.4.3-py2.py3-none-any.whl", hash = "sha256:4b0ce306c966eb73bc3a7b6abad017c556dadd92c44701562cd528ac7fde4d5b"},
-    {file = "distlib-0.4.3.tar.gz", hash = "sha256:f152097224a0ae24be5a0f6bae1b9359af82133bce63f98a95f86cae1aede9ed"},
+    {file = "distlib-0.4.4-py2.py3-none-any.whl", hash = "sha256:cf09d55b1e85a89576b036aeb71550bfd68320f3f21761ca329eadadad918638"},
+    {file = "distlib-0.4.4.tar.gz", hash = "sha256:ca4175b4ac7f71223cc30ed7248c45d2b38c2439d8ee6e498ab67ed63cf3508d"},
 ]
 
 [[package]]
@@ -959,13 +959,13 @@ files = [
 
 [[package]]
 name = "filelock"
-version = "4.2.0"
+version = "4.2.4"
 requires_python = ">=3.11"
 summary = "A platform independent file lock."
 groups = ["dev", "lint"]
 files = [
-    {file = "filelock-4.2.0-py3-none-any.whl", hash = "sha256:2ff5690882e8cdb00ef31fb3d01a3094c29f30985426c59495afb1733f3b7238"},
-    {file = "filelock-4.2.0.tar.gz", hash = "sha256:7a60906c75227cf04d0c273afadc8219400f11aeb13cc69591d4f6cdc6c8036e"},
+    {file = "filelock-4.2.4-py3-none-any.whl", hash = "sha256:301241438c57936ef93f4243a94f2559022268bfcf9b375a9a72eb0f8db8358e"},
+    {file = "filelock-4.2.4.tar.gz", hash = "sha256:c6d8663535e1650ee430507b4ffbac7b464dd64b7647ea0112a9f406499d163d"},
 ]
 
 [[package]]
@@ -1782,7 +1782,7 @@ files = [
 
 [[package]]
 name = "nox"
-version = "2026.8.17"
+version = "2026.10.20"
 requires_python = ">=3.10"
 summary = "Flexible test automation."
 groups = ["dev"]
@@ -1800,8 +1800,8 @@ dependencies = [
     "virtualenv>=21; python_version >= \"3.15\"",
 ]
 files = [
-    {file = "nox-2026.8.17-py3-none-any.whl", hash = "sha256:a96a5286007cbc0d1eb1930e85738668f6722adba1ffaa48287296a96963086e"},
-    {file = "nox-2026.8.17.tar.gz", hash = "sha256:8d9c69c9b996a59db1eb2c6968deaebc2edbc55317d205981bbc4a37351d3f2e"},
+    {file = "nox-2026.10.20-py3-none-any.whl", hash = "sha256:7aff12bb01471f5b087ada34cf0dbe452b02d840593f2e2afecc4bf6e6d6cd3f"},
+    {file = "nox-2026.10.20.tar.gz", hash = "sha256:5da57c009c3dfdd762c068d9079b17966ec967a9eb02cd8ebcf016a946eaf67f"},
 ]
 
 [[package]]
@@ -2138,7 +2138,7 @@ files = [
 
 [[package]]
 name = "python-discovery"
-version = "1.6.2"
+version = "1.6.4"
 requires_python = ">=3.9"
 summary = "Python interpreter discovery"
 groups = ["dev", "lint"]
@@ -2146,8 +2146,8 @@ dependencies = [
     "filelock>=3.16.1",
 ]
 files = [
-    {file = "python_discovery-1.6.2-py3-none-any.whl", hash = "sha256:f0c697f95a3aaec4174a6e5e58f5885e25768684bafc76f1afde384709ebdcf2"},
-    {file = "python_discovery-1.6.2.tar.gz", hash = "sha256:cd1738ca1d37c86ef9d0b654dd46fcee1e41c97c6add12575e8501ced39afdb4"},
+    {file = "python_discovery-1.6.4-py3-none-any.whl", hash = "sha256:530179cc51a1816d512b15635b3dc931295ae12efb183783ad31190a5d425d2b"},
+    {file = "python_discovery-1.6.4.tar.gz", hash = "sha256:bc70d31f0ec5de11eda13d4d64c16e24b3506a65984684f2b6c98cb83b2ea9df"},
 ]
 
 [[package]]
@@ -2515,7 +2515,7 @@ files = [
 
 [[package]]
 name = "virtualenv"
-version = "21.14.8"
+version = "21.14.12"
 requires_python = ">=3.9"
 summary = "Virtual Python Environment builder"
 groups = ["dev", "lint"]
@@ -2529,8 +2529,8 @@ dependencies = [
     "typing-extensions>=4.16; python_version < \"3.11\"",
 ]
 files = [
-    {file = "virtualenv-21.14.8-py3-none-any.whl", hash = "sha256:d2a347fdbc1a65e33c2c5e84dc767b4a3538a25749536a752744d4fe1f71c37a"},
-    {file = "virtualenv-21.14.8.tar.gz", hash = "sha256:394e45ed610ceffb5018e1a179e3a8012c02fd87fe792ab4aae67ce5e7e3afbd"},
+    {file = "virtualenv-21.14.12-py3-none-any.whl", hash = "sha256:7820aeaef23f1f59a96458edfc7f9d3deac937155718de15f1c9a64471e15551"},
+    {file = "virtualenv-21.14.12.tar.gz", hash = "sha256:bbcfb78e36c22ad70c6917c4aecb5e63477d3c138e9f88c946f320e31859c76a"},
 ]
 
 [[package]]

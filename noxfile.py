@@ -13,7 +13,7 @@ from nox import Session, session
 os.environ.update({"PDM_IGNORE_SAVED_PYTHON": "1"})
 
 package = "dlsite_utils"
-python_versions = ["3.14", "3.13", "3.12"]
+python_versions = ["3.15", "3.14", "3.13", "3.12"]
 nox.needs_version = ">= 2021.6.6"
 nox.options.sessions = (
     "pre-commit",

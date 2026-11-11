@@ -328,7 +328,7 @@ name = "certifi"
 version = "2026.10.23"
 requires_python = ">=3.7"
 summary = "Python package for providing Mozilla's CA Bundle."
-groups = ["docs"]
+groups = ["default", "docs"]
 files = [
     {file = "certifi-2026.10.23-py3-none-any.whl", hash = "sha256:e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"},
     {file = "certifi-2026.10.23.tar.gz", hash = "sha256:a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd"},
@@ -340,7 +340,6 @@ version = "2.1.1"
 requires_python = ">=3.10"
 summary = "Foreign Function Interface for Python calling C code."
 groups = ["default"]
-marker = "platform_python_implementation != \"PyPy\""
 dependencies = [
     "pycparser; implementation_name != \"PyPy\"",
 ]
@@ -911,6 +910,50 @@ files = [
 ]
 
 [[package]]
+name = "curl-cffi"
+version = "0.17.0"
+requires_python = ">=3.10"
+summary = "libcurl ffi bindings for Python, with impersonation support."
+groups = ["default"]
+dependencies = [
+    "certifi>=2026.10.19",
+    "cffi>=2.1.1",
+]
+files = [
+    {file = "curl_cffi-0.17.0-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:56d622930eac5cee4cc6ebe63eaba3ecca65a2c73aa6bdf099c2ffae55ee988c"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:88cb5e34eb23eb2106711b06df68027209c72be709df239c6029345551e0acfd"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:aa91d26234516ddb9eb97310d5fe1705aa6f677f101d57ffdb76d5f75439506e"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:93f706c46370cf83c53ffe08cf33892e657c21a6597802f67f1559e4c642ee65"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:af0782d5e340b65fd76701630f0284a8f8243d77df5f2637efd09a4b009f4e24"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-manylinux_2_28_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:7e126f4675d100f1ad6247a0d8e0b3ebe3fa2f4a123e2b9b78e4880b40f5bedd"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-manylinux_2_34_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:c11b405fa10530cec589349c1cc8d60a3a4fac20fb7be0b2713e7271a2737f57"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:3f737d386e77d4e5ac64998fac8b494b35d37e8cbda22f675b0126913e0e4d6d"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:539eb6708c46433cd61745fda756f2754807f4774b31255d8ee56db0e97068fe"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-win_amd64.whl", hash = "sha256:4c3993c7df155d622869b82a56adb018440587fd3faffeaf8d01cc016d2e1357"},
+    {file = "curl_cffi-0.17.0-cp310-abi3-win_arm64.whl", hash = "sha256:e8cfb7eee2019fe879ab3304b33e84ba60dbcec148c34c343c49b8c67f9ddad5"},
+    {file = "curl_cffi-0.17.0-cp313-cp313-android_24_arm64_v8a.whl", hash = "sha256:ae0442e45d6e0c987f84cb88bd6a99d7b91c8e2b017c18048a6c4fed63847c80"},
+    {file = "curl_cffi-0.17.0-cp314-cp314-android_24_arm64_v8a.whl", hash = "sha256:0d85bec9648bf7c14c3b43056ba82521740f72cd96ed7700a0e1973e7fc93f74"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:8a08236aac049468d83fc19699102a3d953769ccbfe2b31b63e1d26c5bb07af3"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:9426fa386a0f299ab043f64e59689d52e6ee2370f19238aa0bb42e6bf3620aaf"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:a93d3cd83aed4307001ca560b931317e0690ddf3c17e86c2d5b6e0722780b40c"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:f7e0817633948a8b00e65ef3662bf139cef3fb4d3847e29a720f8072c3d76a18"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:2cc7d939014953223c96e78098bb24c336e7268eb6529c0d5fa9a53805a4acee"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:fc33ca76371bc96df3c4e8593449a1e0e28086bf8016addb851905090069178c"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-win_amd64.whl", hash = "sha256:51199328450e07c8ef8430a7ccce1acfb199b5cd7595e8f958e84f2faedccdac"},
+    {file = "curl_cffi-0.17.0-cp314-cp314t-win_arm64.whl", hash = "sha256:b09f03f1aafcbbf6175610005e4e0192413148fe44c65b789a2aadfff9384a7d"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-macosx_10_15_x86_64.whl", hash = "sha256:a055f709029d2deaafed6a3a2a58c219d7ee2776a1d2357272d3ef230fb30c5c"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-macosx_11_0_arm64.whl", hash = "sha256:f8cf840646d3e57637b8caae7d0d93334dfed0bfbf6f160b36479a7d6069d547"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:ad88837e627896f794ab77c5d61245f5fbc0da1e86a39043404b94bef45e98ef"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:2dac9c915a0ee7d7cc4285203d210816bb187c8deb5c20ee21e0613639c2a8bf"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-musllinux_1_2_aarch64.whl", hash = "sha256:0e70d25d88adc66818d831805e460704088f445269eaabbf884ab05d437c2f99"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-musllinux_1_2_x86_64.whl", hash = "sha256:4f3413b62c780f2a5c7f8a0f6a1d8114f055043a273981b9732abedb5367202b"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-win_amd64.whl", hash = "sha256:5ca006230676c7c2f2e5708d02e5852a09caee49d82f1f2a469d5d6537a11baa"},
+    {file = "curl_cffi-0.17.0-cp315-abi3.abi3t-win_arm64.whl", hash = "sha256:32f9508a92adaa8c9c35fd4cda786c9e697643afc2eda8dc4c3d426a910b453a"},
+    {file = "curl_cffi-0.17.0-cp315-cp315-android_24_arm64_v8a.whl", hash = "sha256:918a493717da703bc10507b811e347f4ad94132e30c6709fc1e85daf79979565"},
+    {file = "curl_cffi-0.17.0.tar.gz", hash = "sha256:31ee8500d06d6502ce1ec0b7ded1c5aa8e8f3401bbe37ccd78d6153d859d8f3c"},
+]
+
+[[package]]
 name = "dependency-groups"
 version = "1.3.2"
 requires_python = ">=3.9"
@@ -937,36 +980,36 @@ files = [
 
 [[package]]
 name = "dlsite-async"
-version = "0.11.2"
+version = "1.0.0"
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
 dependencies = [
-    "aiohttp<4.0.0,>=3.8.1",
     "beautifulsoup4<5.0.0,>=4.11.1",
     "cryptography>=44.0.0",
+    "curl-cffi>=0.16.3",
     "lxml>=5.3.0",
     "typing-extensions>=4.15.0",
 ]
 files = [
-    {file = "dlsite_async-0.11.2-py3-none-any.whl", hash = "sha256:7af7b352a647f69cd678d76f9d4136fb6c47df20ff797eb070623a49df1b03ce"},
-    {file = "dlsite_async-0.11.2.tar.gz", hash = "sha256:b536f96dc083df93c77bf7076fb17fb67b290a721d3c0dff5111dba0c6567092"},
+    {file = "dlsite_async-1.0.0-py3-none-any.whl", hash = "sha256:79f277485cbb9a730a93ccc6ebcda4608201605ffb908ef939c138c87bc6ec9b"},
+    {file = "dlsite_async-1.0.0.tar.gz", hash = "sha256:73158a448519029a2a4aabfe1ccc2dd0258471318bbc997e2efa7faaf2a52cb2"},
 ]
 
 [[package]]
 name = "dlsite-async"
-version = "0.11.2"
+version = "1.0.0"
 extras = ["pil"]
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
 dependencies = [
     "Pillow>=11.0.0",
-    "dlsite-async==0.11.2",
+    "dlsite-async==1.0.0",
 ]
 files = [
-    {file = "dlsite_async-0.11.2-py3-none-any.whl", hash = "sha256:7af7b352a647f69cd678d76f9d4136fb6c47df20ff797eb070623a49df1b03ce"},
-    {file = "dlsite_async-0.11.2.tar.gz", hash = "sha256:b536f96dc083df93c77bf7076fb17fb67b290a721d3c0dff5111dba0c6567092"},
+    {file = "dlsite_async-1.0.0-py3-none-any.whl", hash = "sha256:79f277485cbb9a730a93ccc6ebcda4608201605ffb908ef939c138c87bc6ec9b"},
+    {file = "dlsite_async-1.0.0.tar.gz", hash = "sha256:73158a448519029a2a4aabfe1ccc2dd0258471318bbc997e2efa7faaf2a52cb2"},
 ]
 
 [[package]]
@@ -2110,7 +2153,7 @@ version = "3.12"
 requires_python = ">=3.11"
 summary = "C parser in Python"
 groups = ["default"]
-marker = "implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\""
+marker = "implementation_name != \"PyPy\""
 files = [
     {file = "pycparser-3.12-py3-none-any.whl", hash = "sha256:a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e"},
     {file = "pycparser-3.12.tar.gz", hash = "sha256:f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6"},

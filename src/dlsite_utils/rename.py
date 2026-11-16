@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, cast
 
 import click
-from aiohttp import ClientResponseError
+from curl_cffi.requests.exceptions import RequestException
 from dlsite_async import DlsiteAPI
 from dlsite_async.exceptions import InvalidIDError
 from dlsite_async.utils import find_product_id
@@ -72,8 +72,8 @@ async def _make_name(
         raise
     try:
         work = configure_work(await api.get_work(product_id), config)
-    except ClientResponseError as e:
-        if e.status == 404:
+    except RequestException as e:
+        if e.response is not None and e.response.status_code == 404:
             click.secho(
                 f"Could not find work {product_id}, it may have been deleted", fg="red"
             )

@@ -10,10 +10,10 @@ from itertools import groupby
 from pathlib import Path
 from typing import Any, TextIO, cast
 
-import aiohttp
 import click
 import dlsite_async
 from bs4 import BeautifulSoup
+from curl_cffi import Response
 from PIL import Image, ImageFile
 from tqdm import tqdm
 
@@ -254,43 +254,47 @@ async def _dl_one(
     force: bool = False,
 ) -> None:
     url = "https://play.dlsite.com/api/v3/download"
-    async with play.get(
-        url, params={"workno": product_id}, timeout=play._DL_TIMEOUT
-    ) as response:
-        if response.content_disposition:
-            # single zip download
-            return await _dl_atomic(
-                play, response, f"{product_id}.zip", output_dir, force=force
-            )
-
-        # legacy split rar download
-        async def _dl_part(url: str, part: int) -> None:
-            async with play.get(url, timeout=play._DL_TIMEOUT) as part_response:
-                await _dl_atomic(
-                    play,
-                    part_response,
-                    f"{product_id}.part{part}.rar",
-                    output_dir,
-                    force=force,
-                )
-
-        soup = BeautifulSoup(await response.text(), "lxml")
-        parts = [a.get("href") for a in soup.find_all("a", class_="btn_dl split")]
-        await asyncio.gather(
-            *(_dl_part(str(url), i) for i, url in enumerate(parts, start=1) if url)
+    response = await play.get(
+        url, params={"workno": product_id}, stream=True, timeout=play._DL_TIMEOUT
+    )
+    if "content-disposition" in response.headers:
+        # single zip download
+        return await _dl_atomic(
+            play, response, f"{product_id}.zip", output_dir, force=force
         )
+
+    # legacy split rar download
+    async def _dl_part(url: str, part: int) -> None:
+        part_response = await play.get(url, stream=True, timeout=play._DL_TIMEOUT)
+        await _dl_atomic(
+            play,
+            part_response,
+            f"{product_id}.part{part}.rar",
+            output_dir,
+            force=force,
+        )
+
+    soup = BeautifulSoup(response.text, "lxml")
+    parts = [a.get("href") for a in soup.find_all("a", class_="btn_dl split")]
+    await asyncio.gather(
+        *(_dl_part(str(url), i) for i, url in enumerate(parts, start=1) if url)
+    )
 
 
 async def _dl_atomic(
     play: dlsite_async.PlayAPI,
-    response: aiohttp.ClientResponse,
+    response: Response,
     default_filename: str,
     output_dir: Path | None,
     force: bool = False,
 ) -> None:
     dest_dir = Path(output_dir) if output_dir else Path.cwd()
-    if response.content_disposition:
-        filename = response.content_disposition.filename or default_filename
+    content_disposition = response.headers.get("content-disposition")
+    if "filename=" in content_disposition:
+        filename = (
+            content_disposition.split("filename=")[1].strip('"').strip("'")
+            or default_filename
+        )
     else:
         filename = default_filename
     dest = dest_dir / filename
@@ -301,16 +305,20 @@ async def _dl_atomic(
     with tempfile.NamedTemporaryFile(
         prefix=dest.name, dir=dest.parent, delete=False
     ) as temp:
+        if "content-length" in response.headers:
+            content_length: int | None = int(response.headers.get("content-length", 0))
+        else:
+            content_length = None
         with tqdm(
             desc=f"Downloading {filename}",
-            total=response.content_length,
+            total=content_length,
             unit="B",
             unit_scale=True,
             unit_divisor=1024,
             leave=True,
         ) as pbar:
             try:
-                async for chunk in response.content.iter_chunked(play._DL_CHUNK_SIZE):
+                async for chunk in response.aiter_content(play._DL_CHUNK_SIZE):  # type: ignore[no-untyped-call]
                     temp.write(chunk)
                     pbar.update(len(chunk))
             except Exception:

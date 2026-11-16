@@ -21,21 +21,27 @@ from .conftest import MockDlsiteAPI
         ),
         (
             Path("RJ1234.zip"),
-            {"circle": "Test Circle"},
+            {"maker_name": "Test Circle"},
             "RJ1234 - [Test Circle] Test Work.zip",
         ),
         (
-            Path("RJ1234.part2.rar"),
-            {"brand": "Test Brand"},
-            "RJ1234 - [Test Brand] Test Work.part2.rar",
+            Path("VJ1234.part2.rar"),
+            {
+                "product_id": "VJ1234",
+                "maker_id": "VG1234",
+                "maker_name": "Test Brand",
+            },
+            "VJ1234 - [Test Brand] Test Work.part2.rar",
         ),
         (
-            Path("RJ1234"),
+            Path("BJ1234"),
             {
-                "publisher": "Test Publisher",
+                "product_id": "BJ1234",
+                "maker_id": "BG1234",
+                "maker_name": "Test Publisher",
                 "author": ["Author 1", "Author 2"],
             },
-            "RJ1234 - [Author 1] Test Work",
+            "BJ1234 - [Author 1] Test Work",
         ),
     ],
 )
@@ -47,14 +53,15 @@ async def test_make_name(
     mocker: MockerFixture,
 ) -> None:
     """Name should be based on work."""
-    work = Work(
-        "RJ1234",
-        "maniax",
-        "RG1234",
-        "Test Work",
-        AgeCategory.R18,
-        **work_kwargs,
-    )
+    kwargs: dict[str, Any] = {
+        "product_id": "RJ1234",
+        "site_id": "maniax",
+        "maker_id": "RG1234",
+        "work_name": "Test Work",
+        "age_category": AgeCategory.R18,
+    }
+    kwargs.update(work_kwargs)
+    work = Work(**kwargs)
     dlsite_api.get_work = mocker.AsyncMock(  # type: ignore[method-assign]
         return_value=work
     )

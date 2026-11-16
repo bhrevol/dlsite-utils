@@ -30,7 +30,7 @@ Must be installed from source.
 [pipx] can be used to install in a standalone environment directly from Github:
 
 ```console
-$ pipx install "dlsite-async[mutagen] @ git+https://github.com/bhrevol/dlsite-utils.git"
+$ pipx install "dlsite-utils[mutagen] @ git+https://github.com/bhrevol/dlsite-utils.git"
 ```
 
 Alternatively, clone this git repository and then install using [pdm] or [pip].
@@ -92,6 +92,7 @@ This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter]
 [hypermodern python cookiecutter]: https://github.com/cjolowicz/cookiecutter-hypermodern-python
 [file an issue]: https://github.com/bhrevol/dlsite-utils/issues
 [pip]: https://pip.pypa.io/
+[pipx]: https://pipx.pypa.io/stable/
 [pdm]: https://pdm-project.org/
 [mutagen]: https://github.com/quodlibet/mutagen
 [dlsite-async]: https://github.com/bhrevol/dlsite-async

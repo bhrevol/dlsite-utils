@@ -154,13 +154,13 @@ files = [
 
 [[package]]
 name = "certifi"
-version = "2026.10.23"
+version = "2026.11.20"
 requires_python = ">=3.7"
 summary = "Python package for providing Mozilla's CA Bundle."
 groups = ["default", "docs"]
 files = [
-    {file = "certifi-2026.10.23-py3-none-any.whl", hash = "sha256:e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"},
-    {file = "certifi-2026.10.23.tar.gz", hash = "sha256:a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd"},
+    {file = "certifi-2026.11.20-py3-none-any.whl", hash = "sha256:7422df25243767b9877031a2248cb14d09ddac9beee846f4cef3d5c9191d488f"},
+    {file = "certifi-2026.11.20.tar.gz", hash = "sha256:af1cb240a8133f105aa52684a3a3258339d7f2fd0bd4e2812698ff5cf5588c4e"},
 ]
 
 [[package]]
@@ -809,7 +809,7 @@ files = [
 
 [[package]]
 name = "dlsite-async"
-version = "1.0.0"
+version = "1.0.1"
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
@@ -821,24 +821,24 @@ dependencies = [
     "typing-extensions>=4.15.0",
 ]
 files = [
-    {file = "dlsite_async-1.0.0-py3-none-any.whl", hash = "sha256:79f277485cbb9a730a93ccc6ebcda4608201605ffb908ef939c138c87bc6ec9b"},
-    {file = "dlsite_async-1.0.0.tar.gz", hash = "sha256:73158a448519029a2a4aabfe1ccc2dd0258471318bbc997e2efa7faaf2a52cb2"},
+    {file = "dlsite_async-1.0.1-py3-none-any.whl", hash = "sha256:79b26235d9731d0a85e45005e26f741fc4d7611bb82bbd1a2e968f7c4d52d171"},
+    {file = "dlsite_async-1.0.1.tar.gz", hash = "sha256:97d22791df9ab0b20230f3a14fd635662234f51587b4f333a4267ce9ec4a9424"},
 ]
 
 [[package]]
 name = "dlsite-async"
-version = "1.0.0"
+version = "1.0.1"
 extras = ["pil"]
 requires_python = "<4.0,>=3.11"
 summary = "DLsite Async"
 groups = ["default"]
 dependencies = [
     "Pillow>=11.0.0",
-    "dlsite-async==1.0.0",
+    "dlsite-async==1.0.1",
 ]
 files = [
-    {file = "dlsite_async-1.0.0-py3-none-any.whl", hash = "sha256:79f277485cbb9a730a93ccc6ebcda4608201605ffb908ef939c138c87bc6ec9b"},
-    {file = "dlsite_async-1.0.0.tar.gz", hash = "sha256:73158a448519029a2a4aabfe1ccc2dd0258471318bbc997e2efa7faaf2a52cb2"},
+    {file = "dlsite_async-1.0.1-py3-none-any.whl", hash = "sha256:79b26235d9731d0a85e45005e26f741fc4d7611bb82bbd1a2e968f7c4d52d171"},
+    {file = "dlsite_async-1.0.1.tar.gz", hash = "sha256:97d22791df9ab0b20230f3a14fd635662234f51587b4f333a4267ce9ec4a9424"},
 ]
 
 [[package]]
@@ -1830,13 +1830,13 @@ files = [
 
 [[package]]
 name = "soupsieve"
-version = "4.1.1"
+version = "4.1.3"
 requires_python = ">=3.11.5"
 summary = "A modern CSS selector implementation for Beautiful Soup."
 groups = ["default", "docs", "tests"]
 files = [
-    {file = "soupsieve-4.1.1-py3-none-any.whl", hash = "sha256:8ff3422dab0b720fb667ee79864d80531a0e57994a13eb701697719ffcb751f6"},
-    {file = "soupsieve-4.1.1.tar.gz", hash = "sha256:b296bd2d2f65b1a78149f3d7bf6736a147d2c9e2dfbde0e4404639d748a02e03"},
+    {file = "soupsieve-4.1.3-py3-none-any.whl", hash = "sha256:7a390d1a57d1ab7bb228531e9b8a750a5ebf87db774e0ef6faeeac057d22a5bf"},
+    {file = "soupsieve-4.1.3.tar.gz", hash = "sha256:13f70186c8f40bf8d0ff7bbab09a18fb149600b465269207b5e5b588f55fda08"},
 ]
 
 [[package]]
